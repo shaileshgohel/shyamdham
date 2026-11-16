@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 // Cheap first gate: no session cookie means straight to /login.
 // The real check (valid, unexpired session; active user; role rights) runs on the server for every page and action.
-const PUBLIC = ["/login", "/lang"];
+const PUBLIC = ["/login", "/lang", "/verify"];
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;

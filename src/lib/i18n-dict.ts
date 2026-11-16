@@ -79,8 +79,8 @@ export const dict = {
   dash_by_area: ["વિસ્તાર પ્રમાણે પરિવાર", "Families by area"],
   dash_coming: ["આગામી તબક્કામાં", "Coming in later phases"],
   dash_coming_text: [
-    "દાન રસીદ, હિસાબ, વાડી બુકિંગ, ઇન્વેન્ટરી, WhatsApp અને OTP લોગિન આગળના તબક્કામાં ઉમેરાશે.",
-    "Donation receipts, accounts, wadi booking, inventory, WhatsApp and OTP login arrive in later phases.",
+    "WhatsApp પર રસીદ અને બિલ, સભ્યોને મેસેજ અને OTP લોગિન છેલ્લા તબક્કામાં ઉમેરાશે.",
+    "WhatsApp receipts and bills, member messaging and OTP sign-in arrive in the last phase.",
   ],
   quick_new_family: ["+ નવો પરિવાર", "+ New family"],
 
@@ -249,6 +249,20 @@ export const dict = {
   ent_member: ["સભ્ય", "Member"],
   ent_master_value: ["યાદી", "Pick-list"],
   ent_session: ["લોગિન", "Session"],
+  ent_donation: ["દાન રસીદ", "Donation"],
+  ent_voucher: ["વાઉચર", "Voucher"],
+  ent_booking: ["વાડી બુકિંગ", "Booking"],
+  ent_item: ["ઇન્વેન્ટરી", "Inventory item"],
+  ent_account_head: ["હિસાબ હેડ", "Account head"],
+  ent_money_account: ["રોકડ / બેંક ખાતું", "Cash / bank account"],
+  ent_facility: ["સુવિધા", "Facility"],
+  ent_charge_item: ["રેટ કાર્ડ", "Rate card"],
+  ent_setting: ["સંસ્થાની વિગત", "Trust details"],
+  ent_donations: ["દાન રજિસ્ટર", "Donation register"],
+  ent_vouchers: ["વાઉચર યાદી", "Voucher list"],
+  ent_report: ["હિસાબ રિપોર્ટ", "Account report"],
+  ent_bookings: ["બુકિંગ યાદી", "Booking list"],
+  ent_inventory: ["ઇન્વેન્ટરી યાદી", "Inventory list"],
 } as const satisfies Record<string, readonly [string, string]>;
 
 export type DictKey = keyof typeof dict;

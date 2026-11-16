@@ -12,3 +12,13 @@ export function useT() {
   const lang = useContext(LangContext);
   return (key: DictKey, vars?: Record<string, string | number>) => translate(lang, key, vars);
 }
+
+/** Inline label for the newer modules: g("ગુજરાતી", "English"). */
+export function useG() {
+  const lang = useContext(LangContext);
+  return (gu: string, en: string) => (lang === "en" ? en : gu);
+}
+
+export function useLang() {
+  return useContext(LangContext);
+}

@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { FlashProvider } from "./flash";
 
 export type NavItem = { href: string; label: string; soon?: string; group?: string };
 
@@ -33,7 +34,7 @@ export function Shell({ items, foot, title, children }: { items: NavItem[]; foot
           <button className="btn sm" onClick={() => setOpen(true)} aria-label="Menu">☰</button>
           <b>{title}</b>
         </div>
-        <main className="main">{children}</main>
+        <main className="main"><FlashProvider>{children}</FlashProvider></main>
       </div>
     </div>
   );

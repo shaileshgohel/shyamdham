@@ -1,0 +1,517 @@
+<title>Shyamdham Portal Plan</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind+Vadodara:wght@400;500;600&family=Mukta+Vaani:wght@500;700;800&display=swap">
+<style>
+/* Layout: one reading column for the plan; wireframes break out wider, each in its own scroll box. */
+:root{
+  --bg:#f5f7fb; --surface:#ffffff; --ink:#17203a; --muted:#5d6785; --line:#d5dbea;
+  --brand:#1d3f8f; --brand-soft:#e4eafa; --gold:#b9770a; --gold-soft:#fbefd6;
+  --wf-fill:#eceff6; --wf-ink:#2b3552; --wf-line:#aab3ca; --ok:#1c7a4a; --bad:#b3372f;
+  --display:"Mukta Vaani","Noto Sans Gujarati","Segoe UI",sans-serif;
+  --body:"Hind Vadodara","Noto Sans Gujarati","Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1424; --surface:#182036; --ink:#e8ecf8; --muted:#9aa5c4; --line:#2e3956;
+  --brand:#8fb0ff; --brand-soft:#1f2c50; --gold:#f0b54a; --gold-soft:#3a2d12;
+  --wf-fill:#222c47; --wf-ink:#d5dcf0; --wf-line:#56628a; --ok:#5fd09a; --bad:#ff8d84; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1424; --surface:#182036; --ink:#e8ecf8; --muted:#9aa5c4; --line:#2e3956;
+  --brand:#8fb0ff; --brand-soft:#1f2c50; --gold:#f0b54a; --gold-soft:#3a2d12;
+  --wf-fill:#222c47; --wf-ink:#d5dcf0; --wf-line:#56628a; --ok:#5fd09a; --bad:#ff8d84; color-scheme:dark}
+
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6}
+.page{max-width:1080px;margin:0 auto;padding-block:40px 80px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;flex-direction:column;gap:56px}
+.col{max-width:720px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;line-height:1.2;margin:0}
+h1{font-size:clamp(30px,5vw,44px);font-weight:800;color:var(--brand)}
+h2{font-size:26px;font-weight:700}
+h3{font-size:18px;font-weight:700}
+p{margin:0}
+.eyebrow{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);font-weight:600}
+.lede{font-size:18px;color:var(--muted)}
+header{display:flex;flex-direction:column;gap:12px}
+section{display:flex;flex-direction:column;gap:20px}
+.muted{color:var(--muted)}
+.tablebox{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:14.5px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;color:var(--muted);font-size:13px;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td.c,th.c{text-align:center}
+.num{font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+.y{color:var(--ok);font-weight:600}.n{color:var(--muted)}
+.phases{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.phase{border-top:3px solid var(--brand);padding-top:10px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.phase b{font-family:var(--display)}
+.phase span{font-size:13px;color:var(--gold);font-weight:600}
+.phase p{font-size:14.5px;color:var(--muted)}
+ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+.callout{background:var(--gold-soft);border-radius:8px;padding:14px 16px;font-size:15px}
+.stack{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px 28px}
+.stack div{min-width:0}
+.stack dt{font-weight:600}.stack dd{margin:0;color:var(--muted);font-size:14.5px}
+dl{margin:0}
+
+/* ---------- wireframes ---------- */
+.wfs{display:flex;flex-direction:column;gap:44px}
+figure.wf{margin:0;display:flex;flex-direction:column;gap:10px}
+.wf-head{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.wf-head b{font-family:var(--display);font-size:18px}
+.wf-head span{font-size:13px;color:var(--muted)}
+figcaption{font-size:14.5px;color:var(--muted);max-width:720px}
+.wf-scroll{overflow-x:auto;border:1.5px solid var(--wf-line);border-radius:10px;background:var(--surface)}
+.wf-frame{min-width:940px;color:var(--wf-ink);font-size:13px;line-height:1.35}
+.wf-chrome{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1.5px solid var(--wf-line);background:var(--wf-fill)}
+.wf-chrome i{width:9px;height:9px;border-radius:50%;border:1.5px solid var(--wf-line);display:block}
+.wf-chrome .url{flex:1;margin-left:8px;border:1.5px solid var(--wf-line);border-radius:12px;padding:2px 12px;font-size:12px;background:var(--surface)}
+.wf-chrome .who{font-size:12px;white-space:nowrap}
+.wf-body{display:grid;grid-template-columns:168px 1fr}
+.wf-side{border-right:1.5px solid var(--wf-line);padding:12px 10px;display:flex;flex-direction:column;gap:3px;background:var(--wf-fill)}
+.wf-side .logo{font-family:var(--display);font-weight:800;font-size:15px;padding:2px 8px 10px;color:var(--brand)}
+.wf-side a{padding:6px 8px;border-radius:6px;color:inherit;text-decoration:none;display:block}
+.wf-side a.on{background:var(--brand);color:var(--surface);font-weight:600}
+.wf-main{padding:16px 18px 20px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.row{display:flex;gap:12px;align-items:stretch}
+.row>*{min-width:0}
+.grow{flex:1}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.top h4{margin:0;font-family:var(--display);font-size:19px}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1.5px solid var(--wf-line);border-radius:6px;padding:5px 12px;background:var(--surface);white-space:nowrap;font-weight:500}
+.btn.pri{background:var(--brand);border-color:var(--brand);color:var(--surface)}
+.btn.wa{background:var(--ok);border-color:var(--ok);color:var(--surface)}
+.box{border:1.5px solid var(--wf-line);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:9px;background:var(--surface)}
+.box>b{font-size:13.5px}
+.kpi{flex:1;border:1.5px solid var(--wf-line);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
+.kpi span{font-size:12px;color:var(--muted)}
+.kpi b{font-size:20px;font-family:var(--display);font-variant-numeric:tabular-nums}
+.f{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}
+.f label{font-size:11.5px;color:var(--muted)}
+.f div{border:1.5px solid var(--wf-line);border-radius:5px;padding:5px 8px;min-height:17px;background:var(--surface);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.f div.tall{min-height:44px;white-space:normal}
+.wt{width:100%;font-size:12.5px}
+.wt th,.wt td{padding:6px 8px;border-bottom:1px solid var(--wf-line)}
+.wt th{font-size:11.5px;background:var(--wf-fill)}
+.chip{display:inline-block;border:1.5px solid var(--wf-line);border-radius:20px;padding:1px 9px;font-size:11.5px;white-space:nowrap}
+.chip.g{border-color:var(--ok);color:var(--ok)}.chip.r{border-color:var(--bad);color:var(--bad)}
+.chip.b{background:var(--brand-soft);border-color:var(--brand);color:var(--brand)}
+.tabs{display:flex;gap:4px;border-bottom:1.5px solid var(--wf-line)}
+.tabs span{padding:6px 12px;border:1.5px solid transparent;border-bottom:0;border-radius:6px 6px 0 0}
+.tabs span.on{border-color:var(--wf-line);background:var(--wf-fill);font-weight:600}
+.bars{display:flex;align-items:flex-end;gap:10px;height:110px;border-bottom:1.5px solid var(--wf-line);padding:0 6px}
+.bars div{flex:1;display:flex;gap:3px;align-items:flex-end;height:100%}
+.bars i{flex:1;background:var(--brand);display:block;border-radius:2px 2px 0 0}
+.bars i+i{background:var(--wf-line)}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);border-left:1px solid var(--wf-line);border-top:1px solid var(--wf-line)}
+.cal div{border-right:1px solid var(--wf-line);border-bottom:1px solid var(--wf-line);min-height:50px;padding:3px 5px;font-size:11.5px;display:flex;flex-direction:column;gap:2px}
+.cal div.h{min-height:0;background:var(--wf-fill);font-weight:600;text-align:center;display:block}
+.cal em{font-style:normal;border-radius:3px;padding:0 4px;background:var(--brand-soft);color:var(--brand);font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cal em.p{background:var(--gold-soft);color:var(--gold)}
+.cal div.sel{outline:2px solid var(--brand);outline-offset:-2px}
+.pdf{border:1.5px solid var(--wf-line);background:var(--surface);padding:14px;display:flex;flex-direction:column;gap:7px;font-size:12px;box-shadow:3px 3px 0 var(--wf-fill)}
+.pdf .hd{text-align:center;border-bottom:1.5px solid var(--wf-ink);padding-bottom:6px}
+.pdf .hd b{font-family:var(--display);font-size:16px;display:block}
+.pdf .ln{display:flex;justify-content:space-between;gap:10px;border-bottom:1px dotted var(--wf-line);padding-bottom:3px}
+.pdf .amt{border:1.5px solid var(--wf-ink);padding:5px 10px;font-weight:700;font-size:15px;align-self:flex-start}
+.qr{width:44px;height:44px;border:1.5px solid var(--wf-ink);background:repeating-linear-gradient(45deg,var(--wf-fill) 0 4px,var(--surface) 4px 8px)}
+.tag{font-size:11px;color:var(--muted)}
+.ex{font-size:11.5px;color:var(--gold);font-weight:600}
+.phones{display:flex;gap:28px;flex-wrap:wrap}
+.phone{width:270px;max-width:100%;border:1.5px solid var(--wf-line);border-radius:26px;padding:10px;background:var(--surface);color:var(--wf-ink);font-size:12.5px;line-height:1.4;display:flex;flex-direction:column;gap:8px}
+.phone .bar{background:var(--ok);color:var(--surface);border-radius:16px 16px 4px 4px;padding:8px 12px;font-weight:600}
+.phone .chat{background:var(--wf-fill);border-radius:4px 4px 16px 16px;padding:10px;display:flex;flex-direction:column;gap:8px;min-height:300px}
+.bub{background:var(--surface);border:1px solid var(--wf-line);border-radius:8px;padding:8px;display:flex;flex-direction:column;gap:5px}
+.doc{border:1.5px solid var(--wf-line);border-radius:6px;padding:8px;display:flex;gap:8px;align-items:center;background:var(--wf-fill)}
+.doc i{width:26px;height:32px;border:1.5px solid var(--bad);color:var(--bad);font-style:normal;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;border-radius:3px;flex:none}
+</style>
+
+<div class="page">
+
+<header class="col">
+  <p class="eyebrow">કડિયા જ્ઞાતિ · શ્યામધામ મધુરમ, જુનાગઢ</p>
+  <h1>શ્યામધામ વ્યવસ્થાપન પોર્ટલ</h1>
+  <p class="lede">A plan for one cloud portal that handles members, messaging, accounts, donation receipts, wadi rental bills, inventory and user rights, with ten wireframes of the main screens.</p>
+</header>
+
+<section>
+  <div class="col" style="display:flex;flex-direction:column;gap:12px">
+    <h2>What the portal covers</h2>
+    <p>Each of your eight requirements becomes a module. They share one member list and one set of books, so a donation or a rental bill is entered once and shows up in the receipt, the WhatsApp message, the accounts and the audit log.</p>
+  </div>
+  <div class="tablebox"><table>
+    <tr><th>Your requirement</th><th>Module</th><th>What it does</th></tr>
+    <tr><td>સભ્ય રજિસ્ટ્રેશન, પરિવાર, ડિરેક્ટરી</td><td><b>સભ્યો</b></td><td>One record per family with a head member and family members. Search and filter by village, area, occupation or blood group. Export to PDF or Excel.</td></tr>
+    <tr><td>સભ્યોને મેસેજ</td><td><b>મેસેજ</b></td><td>Send WhatsApp (and SMS as backup) to everyone, an area, or a saved group. Templates for events, condolence notices and meeting calls. Delivery report per message.</td></tr>
+    <tr><td>હેડવાઈઝ આવક-જાવક અને રિપોર્ટ</td><td><b>હિસાબ</b></td><td>Income and expense vouchers under heads you define. Day book, head-wise ledger, monthly and yearly (April to March) reports, cash and bank balance.</td></tr>
+    <tr><td>દાનની PDF રસીદ WhatsApp પર</td><td><b>દાન રસીદ</b></td><td>Enter the donation, press one button. The system numbers the receipt, makes the PDF in Gujarati, sends it on WhatsApp and posts the income entry.</td></tr>
+    <tr><td>વાડી ભાડાનું બિલ અને હિસાબ</td><td><b>વાડી બુકિંગ</b></td><td>Booking calendar that prevents double booking. Rate card, deposit, advance and balance. Bill PDF goes on WhatsApp and every payment posts to accounts.</td></tr>
+    <tr><td>ઇન્વેન્ટરી</td><td><b>ઇન્વેન્ટરી</b></td><td>Register of utensils, furniture, sound and electrical items. Issue against a booking, record returns, damage and shortage, and charge it on the bill.</td></tr>
+    <tr><td>અલગ લોગિન અને અધિકારો</td><td><b>યુઝર્સ</b></td><td>Each person signs in with their own mobile number and OTP. A role decides which modules they can see, create, edit or cancel.</td></tr>
+    <tr><td>કોણે રસીદ/બિલ બનાવ્યું</td><td><b>ઓડિટ લોગ</b></td><td>Every receipt, bill, voucher, edit and cancellation is stamped with user, time and device. Only the Super Admin can read it. Nobody can delete it.</td></tr>
+  </table></div>
+</section>
+
+<section>
+  <div class="col" style="display:flex;flex-direction:column;gap:12px">
+    <h2>Roles and rights</h2>
+    <p>A starting set of six roles. The Super Admin can change any tick or create new roles later.</p>
+  </div>
+  <div class="tablebox"><table>
+    <tr><th>Module</th><th class="c">Super Admin</th><th class="c">ટ્રસ્ટી</th><th class="c">હિસાબનીશ</th><th class="c">રસીદ ક્લાર્ક</th><th class="c">વાડી મેનેજર</th><th class="c">સ્ટોર કીપર</th></tr>
+    <tr><td>સભ્યો અને ડિરેક્ટરી</td><td class="c y">Full</td><td class="c y">Full</td><td class="c">View</td><td class="c">View, add</td><td class="c">View</td><td class="c n">–</td></tr>
+    <tr><td>મેસેજ મોકલવા</td><td class="c y">Full</td><td class="c y">Full</td><td class="c n">–</td><td class="c n">–</td><td class="c n">–</td><td class="c n">–</td></tr>
+    <tr><td>દાન રસીદ</td><td class="c y">Full</td><td class="c">View</td><td class="c y">Full</td><td class="c">Create</td><td class="c n">–</td><td class="c n">–</td></tr>
+    <tr><td>વાડી બુકિંગ અને બિલ</td><td class="c y">Full</td><td class="c">View</td><td class="c">View</td><td class="c n">–</td><td class="c y">Full</td><td class="c">View</td></tr>
+    <tr><td>હિસાબ અને રિપોર્ટ</td><td class="c y">Full</td><td class="c">View</td><td class="c y">Full</td><td class="c n">–</td><td class="c n">–</td><td class="c n">–</td></tr>
+    <tr><td>ઇન્વેન્ટરી</td><td class="c y">Full</td><td class="c">View</td><td class="c">View</td><td class="c n">–</td><td class="c">Issue, return</td><td class="c y">Full</td></tr>
+    <tr><td>રસીદ/બિલ રદ કરવું</td><td class="c y">Yes</td><td class="c n">–</td><td class="c">Request</td><td class="c n">–</td><td class="c">Request</td><td class="c n">–</td></tr>
+    <tr><td>યુઝર્સ અને ઓડિટ લોગ</td><td class="c y">Full</td><td class="c n">–</td><td class="c n">–</td><td class="c n">–</td><td class="c n">–</td><td class="c n">–</td></tr>
+  </table></div>
+</section>
+
+<section>
+  <div class="col" style="display:flex;flex-direction:column;gap:12px">
+    <h2>Wireframes</h2>
+    <p>Low-detail layouts that show what sits on each screen, not final colours or styling. The interface is in Gujarati with an English switch. All names and amounts are sample data.</p>
+  </div>
+
+  <div class="wfs">
+
+  <figure class="wf" id="wf-dashboard" data-nav="0" data-url="dashboard">
+    <div class="wf-head"><b>1. ડેશબોર્ડ</b><span>Dashboard, Super Admin view</span></div>
+    <div class="wf-main">
+      <div class="top"><h4>ડેશબોર્ડ</h4><div class="btns"><span class="btn pri">+ નવી દાન રસીદ</span><span class="btn">+ નવું બુકિંગ</span><span class="btn">+ વાઉચર</span></div></div>
+      <div class="row">
+        <div class="kpi"><span>આજની આવક</span><b>₹ 18,500</b></div>
+        <div class="kpi"><span>આજની જાવક</span><b>₹ 4,200</b></div>
+        <div class="kpi"><span>આ મહિનાનું દાન</span><b>₹ 2,41,000</b></div>
+        <div class="kpi"><span>રોકડ + બેંક સિલક</span><b>₹ 9,75,300</b></div>
+        <div class="kpi"><span>કુલ પરિવાર</span><b>1,240</b></div>
+      </div>
+      <div class="row">
+        <div class="box grow"><b>માસિક આવક / જાવક</b>
+          <div class="bars"><div><i style="height:55%"></i><i style="height:30%"></i></div><div><i style="height:70%"></i><i style="height:42%"></i></div><div><i style="height:48%"></i><i style="height:36%"></i></div><div><i style="height:90%"></i><i style="height:50%"></i></div><div><i style="height:62%"></i><i style="height:28%"></i></div><div><i style="height:80%"></i><i style="height:60%"></i></div></div>
+          <span class="tag">એપ્રિલ – સપ્ટેમ્બર · <span style="color:var(--brand)">■</span> આવક <span style="color:var(--wf-line)">■</span> જાવક</span>
+        </div>
+        <div class="box" style="width:250px"><b>આગામી બુકિંગ</b>
+          <span>15 નવે · વાડી હોલ · લગ્ન <span class="chip g">ભરાયેલ</span></span>
+          <span>18 નવે · રસોડું · બેસણું <span class="chip r">બાકી ₹3,000</span></span>
+          <span>22 નવે · વાડી હોલ · સગાઈ <span class="chip">એડવાન્સ</span></span>
+          <b style="margin-top:4px">ઓછો સ્ટોક</b>
+          <span>સ્ટીલ થાળી · 40 ખૂટે છે</span>
+        </div>
+      </div>
+      <div class="box"><b>છેલ્લી રસીદ અને બિલ</b>
+        <table class="wt"><tr><th>નંબર</th><th>પ્રકાર</th><th>નામ</th><th class="num">રકમ</th><th>બનાવનાર</th><th>સમય</th><th>WhatsApp</th></tr>
+        <tr><td>SD/26-27/0412</td><td>દાન</td><td>રમેશભાઈ પરમાર</td><td class="num">₹ 5,100</td><td>કિશોરભાઈ</td><td>11:42</td><td><span class="chip g">પહોંચ્યો ✓✓</span></td></tr>
+        <tr><td>WB/26-27/0087</td><td>વાડી બિલ</td><td>જયેશભાઈ ચૌહાણ</td><td class="num">₹ 21,000</td><td>મહેશભાઈ</td><td>10:15</td><td><span class="chip g">પહોંચ્યો ✓✓</span></td></tr>
+        <tr><td>SD/26-27/0411</td><td>દાન</td><td>ભાવનાબેન ટાંક</td><td class="num">₹ 1,100</td><td>કિશોરભાઈ</td><td>09:50</td><td><span class="chip r">નિષ્ફળ · ફરી મોકલો</span></td></tr></table>
+      </div>
+    </div>
+    <figcaption>The home screen answers the daily questions at a glance: money in and out today, balance, upcoming bookings, and who made the latest receipts. Other roles see only the tiles their rights allow.</figcaption>
+  </figure>
+
+  <figure class="wf" id="wf-member" data-nav="1" data-url="members/new">
+    <div class="wf-head"><b>2. સભ્ય રજિસ્ટ્રેશન</b><span>Member and family registration</span></div>
+    <div class="wf-main">
+      <div class="top"><h4>નવો પરિવાર નોંધો</h4><div class="btns"><span class="btn">રદ કરો</span><span class="btn pri">સેવ કરો</span></div></div>
+      <div class="row">
+        <div class="box grow"><b>મુખ્ય સભ્ય</b>
+          <div class="row"><div class="f"><label>નામ</label><div>રમેશભાઈ</div></div><div class="f"><label>પિતાનું નામ</label><div>મોહનભાઈ</div></div><div class="f"><label>અટક</label><div>પરમાર</div></div></div>
+          <div class="row"><div class="f"><label>મોબાઈલ (WhatsApp)</label><div>98xxx xxx10</div></div><div class="f"><label>જન્મ તારીખ</label><div>12/03/1971</div></div><div class="f"><label>બ્લડ ગ્રુપ</label><div>B+ ▾</div></div></div>
+          <div class="row"><div class="f"><label>મૂળ વતન</label><div>વંથલી ▾</div></div><div class="f"><label>વિસ્તાર</label><div>મધુરમ ▾</div></div><div class="f"><label>વ્યવસાય</label><div>કોન્ટ્રાક્ટર ▾</div></div></div>
+          <div class="f"><label>સરનામું</label><div class="tall">&nbsp;</div></div>
+          <div class="row"><div class="f"><label>સભ્ય નંબર (ઓટો)</label><div>M-01241</div></div><div class="f"><label>સભ્યપદ</label><div>આજીવન ▾</div></div><div class="f"><label>PAN (દાન રસીદ માટે, વૈકલ્પિક)</label><div>&nbsp;</div></div></div>
+        </div>
+        <div class="box" style="width:120px;align-items:center;justify-content:center"><div style="width:70px;height:84px;border:1.5px dashed var(--wf-line);border-radius:6px"></div><span class="tag">ફોટો</span><span class="btn">અપલોડ</span></div>
+      </div>
+      <div class="box"><div class="top"><b>પરિવારના સભ્યો</b><span class="btn">+ સભ્ય ઉમેરો</span></div>
+        <table class="wt"><tr><th>નામ</th><th>સંબંધ</th><th>જન્મ તારીખ</th><th>અભ્યાસ</th><th>વ્યવસાય</th><th>મોબાઈલ</th><th>વૈવાહિક સ્થિતિ</th></tr>
+        <tr><td>ગીતાબેન</td><td>પત્ની</td><td>05/08/1974</td><td>ધો. 10</td><td>ગૃહિણી</td><td>97xxx xxx22</td><td>પરિણીત</td></tr>
+        <tr><td>હાર્દિક</td><td>પુત્ર</td><td>21/01/1998</td><td>B.E. Civil</td><td>એન્જિનિયર</td><td>90xxx xxx31</td><td>અપરિણીત</td></tr>
+        <tr><td>પૂજા</td><td>પુત્રી</td><td>14/11/2001</td><td>B.Com</td><td>અભ્યાસ</td><td>–</td><td>અપરિણીત</td></tr></table>
+      </div>
+    </div>
+    <figcaption>One form per family. The mobile number is checked for duplicates. Fields such as વતન, વિસ્તાર and વ્યવસાય are pick-lists so the directory filters stay clean.</figcaption>
+  </figure>
+
+  <figure class="wf" id="wf-directory" data-nav="1" data-url="members">
+    <div class="wf-head"><b>3. સભ્ય ડિરેક્ટરી</b><span>Contact directory</span></div>
+    <div class="wf-main">
+      <div class="top"><h4>સભ્ય ડિરેક્ટરી</h4><div class="btns"><span class="btn">Excel</span><span class="btn">PDF ડિરેક્ટરી</span><span class="btn pri">+ નવો પરિવાર</span></div></div>
+      <div class="row"><div class="f" style="flex:2"><label>શોધો</label><div>નામ, અટક અથવા મોબાઈલ…</div></div><div class="f"><label>વતન</label><div>બધા ▾</div></div><div class="f"><label>વિસ્તાર</label><div>બધા ▾</div></div><div class="f"><label>વ્યવસાય</label><div>બધા ▾</div></div><div class="f"><label>બ્લડ ગ્રુપ</label><div>બધા ▾</div></div></div>
+      <div class="box">
+        <table class="wt"><tr><th>☐</th><th>સભ્ય નં.</th><th>નામ</th><th>વતન</th><th>વિસ્તાર</th><th>મોબાઈલ</th><th>સભ્યો</th><th>વ્યવસાય</th><th></th></tr>
+        <tr><td>☑</td><td>M-01241</td><td>રમેશભાઈ મોહનભાઈ પરમાર</td><td>વંથલી</td><td>મધુરમ</td><td>98xxx xxx10</td><td>4</td><td>કોન્ટ્રાક્ટર</td><td>જુઓ · મેસેજ</td></tr>
+        <tr><td>☑</td><td>M-01187</td><td>જયેશભાઈ કાનજીભાઈ ચૌહાણ</td><td>કેશોદ</td><td>ઝાંઝરડા રોડ</td><td>99xxx xxx45</td><td>5</td><td>વેપાર</td><td>જુઓ · મેસેજ</td></tr>
+        <tr><td>☐</td><td>M-00932</td><td>ભાવનાબેન દિનેશભાઈ ટાંક</td><td>માણાવદર</td><td>ટીંબાવાડી</td><td>94xxx xxx08</td><td>3</td><td>શિક્ષક</td><td>જુઓ · મેસેજ</td></tr>
+        <tr><td>☐</td><td>M-00518</td><td>વિનોદભાઈ બાબુભાઈ રાઠોડ</td><td>વિસાવદર</td><td>મધુરમ</td><td>98xxx xxx77</td><td>6</td><td>સુથારી કામ</td><td>જુઓ · મેસેજ</td></tr></table>
+        <div class="top"><span class="tag">1,240 માંથી 1–25 · 2 પસંદ કરેલ</span><div class="btns"><span class="btn wa">પસંદ કરેલને મેસેજ</span><span class="btn">‹</span><span class="btn">›</span></div></div>
+      </div>
+    </div>
+    <figcaption>Search and filter the whole community. Tick families to message them directly, or print the filtered list as a directory booklet.</figcaption>
+  </figure>
+
+  <figure class="wf" id="wf-message" data-nav="2" data-url="messages/new">
+    <div class="wf-head"><b>4. મેસેજ મોકલો</b><span>Broadcast to members</span></div>
+    <div class="wf-main">
+      <div class="top"><h4>નવો મેસેજ</h4><div class="tabs"><span class="on">નવો મેસેજ</span><span>મોકલેલા</span><span>ટેમ્પલેટ</span><span>ગ્રુપ</span></div></div>
+      <div class="row">
+        <div class="box grow"><b>કોને મોકલવો</b>
+          <div class="btns"><span class="chip b">◉ બધા સભ્યો (1,240)</span><span class="chip">○ વિસ્તાર પ્રમાણે</span><span class="chip">○ ગ્રુપ: કારોબારી</span><span class="chip">○ ગ્રુપ: યુવક મંડળ</span><span class="chip">○ જાતે પસંદ કરો</span></div>
+          <div class="row"><div class="f"><label>ચેનલ</label><div>WhatsApp, નિષ્ફળ જાય તો SMS ▾</div></div><div class="f"><label>ટેમ્પલેટ</label><div>કાર્યક્રમ આમંત્રણ ▾</div></div></div>
+          <div class="f"><label>મેસેજ</label><div class="tall">જય શ્રી કૃષ્ણ {નામ}, શ્યામધામ મધુરમ ખાતે તા. 22/11 ના રોજ સ્નેહમિલન રાખેલ છે. સહપરિવાર પધારશો.</div></div>
+          <div class="row"><div class="f"><label>જોડાણ (PDF / ફોટો)</label><div>amantran.pdf</div></div><div class="f"><label>ક્યારે</label><div>હમણાં ▾</div></div></div>
+          <div class="btns"><span class="btn">ટેસ્ટ મને મોકલો</span><span class="btn wa">1,240 સભ્યોને મોકલો</span></div>
+        </div>
+        <div class="box" style="width:260px"><b>છેલ્લા મેસેજનો રિપોર્ટ</b>
+          <span>વાર્ષિક સભા નોટિસ · 02 નવે</span>
+          <table class="wt"><tr><td>મોકલ્યા</td><td class="num">1,236</td></tr><tr><td>પહોંચ્યા</td><td class="num">1,198</td></tr><tr><td>વાંચ્યા</td><td class="num">964</td></tr><tr><td>નિષ્ફળ</td><td class="num">38</td></tr></table>
+          <span class="btn">નિષ્ફળ નંબરની યાદી</span>
+        </div>
+      </div>
+    </div>
+    <figcaption>Pick an audience, pick a template, send. The report shows which numbers failed so the office can correct them in the directory.</figcaption>
+  </figure>
+
+  <figure class="wf" id="wf-donation" data-nav="3" data-url="donations/new">
+    <div class="wf-head"><b>5. દાન રસીદ</b><span>Donation receipt with PDF and WhatsApp</span></div>
+    <div class="wf-main">
+      <div class="top"><h4>નવી દાન રસીદ</h4><span class="tag">રસીદ નં. સેવ કરતી વખતે આપોઆપ મળશે</span></div>
+      <div class="row">
+        <div class="box grow"><b>દાનની વિગત</b>
+          <div class="f"><label>દાતા (સભ્ય શોધો અથવા નવું નામ લખો)</label><div>રમેશભાઈ મોહનભાઈ પરમાર · M-01241</div></div>
+          <div class="row"><div class="f"><label>WhatsApp નંબર</label><div>98xxx xxx10</div></div><div class="f"><label>તારીખ</label><div>12/11/2026</div></div></div>
+          <div class="row"><div class="f"><label>રકમ ₹</label><div>5,100</div></div><div class="f"><label>હેડ</label><div>બાંધકામ ફંડ ▾</div></div></div>
+          <div class="row"><div class="f"><label>પેમેન્ટ</label><div>◉ રોકડ ○ UPI ○ ચેક ○ બેંક</div></div><div class="f"><label>ચેક / UTR નં.</label><div>&nbsp;</div></div></div>
+          <div class="row"><div class="f"><label>PAN (વૈકલ્પિક)</label><div>&nbsp;</div></div><div class="f"><label>સ્મરણાર્થે / નોંધ</label><div>સ્વ. મોહનભાઈના સ્મરણાર્થે</div></div></div>
+          <div class="btns"><span class="btn wa">સેવ કરો અને WhatsApp મોકલો</span><span class="btn">સેવ અને પ્રિન્ટ</span><span class="btn">ફક્ત સેવ</span></div>
+        </div>
+        <div style="width:300px;display:flex;flex-direction:column;gap:8px">
+          <span class="tag">PDF પ્રિવ્યૂ</span>
+          <div class="pdf">
+            <div class="hd"><b>શ્યામધામ મધુરમ</b>શ્રી કડિયા જ્ઞાતિ, જુનાગઢ<br><span class="tag">રજી. નં. · PAN · સરનામું</span></div>
+            <div class="ln"><span>રસીદ નં. SD/26-27/0412</span><span>તા. 12/11/2026</span></div>
+            <div class="ln"><span>શ્રી</span><span>રમેશભાઈ મોહનભાઈ પરમાર</span></div>
+            <div class="ln"><span>હેડ</span><span>બાંધકામ ફંડ</span></div>
+            <div class="ln"><span>અંકે રૂપિયા</span><span>પાંચ હજાર એકસો પૂરા</span></div>
+            <div class="ln"><span>પેમેન્ટ</span><span>રોકડ</span></div>
+            <div class="row" style="justify-content:space-between;align-items:flex-end"><span class="amt">₹ 5,100/-</span><div class="qr"></div></div>
+            <div class="ln" style="border:0"><span class="tag">બનાવનાર: કિશોરભાઈ · 11:42</span><span class="tag">સહી</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <figcaption>One screen, one button. Saving assigns the next number in the year's series, posts ₹5,100 to the બાંધકામ ફંડ income head, and sends the PDF. The QR code lets anyone verify the receipt is genuine. A saved receipt cannot be edited, only cancelled with a reason.</figcaption>
+  </figure>
+
+  <figure class="wf" id="wf-booking" data-nav="4" data-url="bookings">
+    <div class="wf-head"><b>6. વાડી બુકિંગ અને બિલ</b><span>Facility booking and rental bill</span></div>
+    <div class="wf-main">
+      <div class="top"><h4>વાડી બુકિંગ · નવેમ્બર 2026</h4><div class="btns"><span class="btn">‹ ઓક્ટો</span><span class="btn">ડિસે ›</span><span class="btn">સુવિધા: બધી ▾</span><span class="btn pri">+ નવું બુકિંગ</span></div></div>
+      <div class="row">
+        <div class="grow">
+          <div class="cal">
+            <div class="h">રવિ</div><div class="h">સોમ</div><div class="h">મંગળ</div><div class="h">બુધ</div><div class="h">ગુરુ</div><div class="h">શુક્ર</div><div class="h">શનિ</div>
+            <div>8</div><div>9</div><div>10</div><div>11</div><div>12</div><div>13</div><div>14</div>
+            <div class="sel">15<em>હોલ · લગ્ન</em><em>રસોડું</em></div><div>16</div><div>17</div><div>18<em class="p">રસોડું · બેસણું</em></div><div>19</div><div>20</div><div>21</div>
+            <div>22<em class="p">હોલ · સગાઈ</em></div><div>23</div><div>24</div><div>25<em>હોલ · લગ્ન</em></div><div>26<em>હોલ · લગ્ન</em></div><div>27</div><div>28</div>
+          </div>
+          <span class="tag"><span style="color:var(--brand)">■</span> પૂરું ભરાયેલ &nbsp; <span style="color:var(--gold)">■</span> એડવાન્સ / બાકી</span>
+        </div>
+        <div class="box" style="width:310px"><div class="top"><b>બિલ WB/26-27/0087</b><span class="chip g">ભરાયેલ</span></div>
+          <span>જયેશભાઈ ચૌહાણ · 99xxx xxx45<br>15 નવે, આખો દિવસ · લગ્ન પ્રસંગ</span>
+          <table class="wt"><tr><th>વિગત</th><th class="num">રકમ ₹</th></tr>
+          <tr><td>વાડી હોલ ભાડું</td><td class="num">15,000</td></tr>
+          <tr><td>રસોડું + ગેસ</td><td class="num">3,500</td></tr>
+          <tr><td>વાસણ સેટ (500 વ્યક્તિ)</td><td class="num">2,000</td></tr>
+          <tr><td>લાઈટ / સફાઈ ચાર્જ</td><td class="num">1,500</td></tr>
+          <tr><td>સભ્ય ડિસ્કાઉન્ટ</td><td class="num">− 1,000</td></tr>
+          <tr><td><b>કુલ</b></td><td class="num"><b>21,000</b></td></tr>
+          <tr><td>ડિપોઝિટ (પરત મળવાપાત્ર)</td><td class="num">5,000</td></tr>
+          <tr><td>મળેલ</td><td class="num">26,000</td></tr></table>
+          <div class="btns"><span class="btn wa">બિલ WhatsApp</span><span class="btn">પેમેન્ટ લો</span><span class="btn">વસ્તુ આપો</span></div>
+        </div>
+      </div>
+    </div>
+    <figcaption>The calendar blocks a second booking of the same facility and slot. Charges come from a rate card with member and non-member rates. Advance, balance and deposit refund each post to the accounts as they happen.</figcaption>
+  </figure>
+
+  <figure class="wf" id="wf-accounts" data-nav="5" data-url="accounts/headwise">
+    <div class="wf-head"><b>7. હિસાબ અને રિપોર્ટ</b><span>Head-wise accounts and reports</span></div>
+    <div class="wf-main">
+      <div class="top"><h4>આવક-જાવક</h4><div class="btns"><span class="btn pri">+ આવક વાઉચર</span><span class="btn pri">+ જાવક વાઉચર</span><span class="btn">PDF</span><span class="btn">Excel</span></div></div>
+      <div class="row" style="align-items:flex-end"><div class="tabs grow"><span>રોજમેળ (દૈનિક)</span><span class="on">હેડવાઈઝ</span><span>માસિક</span><span>વાર્ષિક</span><span>રોકડ / બેંક</span></div><div class="f" style="flex:none;width:210px"><label>સમયગાળો</label><div>01/04/2026 – 12/11/2026</div></div></div>
+      <div class="row">
+        <div class="box grow"><b>આવક</b>
+          <table class="wt"><tr><th>હેડ</th><th class="num">એન્ટ્રી</th><th class="num">રકમ ₹</th></tr>
+          <tr><td>સામાન્ય દાન</td><td class="num">212</td><td class="num">4,18,600</td></tr>
+          <tr><td>બાંધકામ ફંડ</td><td class="num">96</td><td class="num">7,52,000</td></tr>
+          <tr><td>વાડી ભાડા આવક</td><td class="num">87</td><td class="num">9,84,500</td></tr>
+          <tr><td>સભ્ય ફી</td><td class="num">140</td><td class="num">70,000</td></tr>
+          <tr><td>બેંક વ્યાજ</td><td class="num">2</td><td class="num">31,240</td></tr>
+          <tr><td><b>કુલ આવક</b></td><td></td><td class="num"><b>22,56,340</b></td></tr></table>
+        </div>
+        <div class="box grow"><b>જાવક</b>
+          <table class="wt"><tr><th>હેડ</th><th class="num">એન્ટ્રી</th><th class="num">રકમ ₹</th></tr>
+          <tr><td>લાઈટ બિલ</td><td class="num">7</td><td class="num">1,12,300</td></tr>
+          <tr><td>પગાર</td><td class="num">21</td><td class="num">2,52,000</td></tr>
+          <tr><td>રિપેરિંગ / મેન્ટેનન્સ</td><td class="num">34</td><td class="num">1,86,750</td></tr>
+          <tr><td>બાંધકામ ખર્ચ</td><td class="num">18</td><td class="num">6,40,000</td></tr>
+          <tr><td>ઉત્સવ ખર્ચ</td><td class="num">26</td><td class="num">1,45,900</td></tr>
+          <tr><td><b>કુલ જાવક</b></td><td></td><td class="num"><b>13,36,950</b></td></tr></table>
+        </div>
+      </div>
+      <div class="row"><div class="kpi"><span>ઉઘડતી સિલક</span><b>₹ 55,910</b></div><div class="kpi"><span>વધારો</span><b>₹ 9,19,390</b></div><div class="kpi"><span>રોકડ સિલક</span><b>₹ 42,300</b></div><div class="kpi"><span>બેંક સિલક</span><b>₹ 9,33,000</b></div></div>
+    </div>
+    <figcaption>Click any head to see every voucher behind it. Receipts and bills post here on their own, so the accountant enters only expenses and other income by hand. Expense vouchers can carry a photo of the paper bill.</figcaption>
+  </figure>
+
+  <figure class="wf" id="wf-inventory" data-nav="7" data-url="inventory">
+    <div class="wf-head"><b>8. ઇન્વેન્ટરી</b><span>Stock of all Shyamdham items</span></div>
+    <div class="wf-main">
+      <div class="top"><h4>ઇન્વેન્ટરી</h4><div class="btns"><span class="btn">વસ્તુ આપો (ઇશ્યૂ)</span><span class="btn">પરત લો</span><span class="btn">સ્ટોક ગણતરી</span><span class="btn pri">+ નવી વસ્તુ</span></div></div>
+      <div class="row"><div class="f" style="flex:2"><label>શોધો</label><div>વસ્તુનું નામ…</div></div><div class="f"><label>કેટેગરી</label><div>બધી ▾</div></div><div class="f"><label>સ્થળ</label><div>બધા ▾</div></div></div>
+      <div class="box">
+        <table class="wt"><tr><th>વસ્તુ</th><th>કેટેગરી</th><th>સ્થળ</th><th class="num">કુલ</th><th class="num">બહાર આપેલ</th><th class="num">નુકસાન / ખૂટ</th><th class="num">ઉપલબ્ધ</th><th>સ્થિતિ</th></tr>
+        <tr><td>સ્ટીલ થાળી</td><td>વાસણ</td><td>સ્ટોર રૂમ 1</td><td class="num">1,000</td><td class="num">500</td><td class="num">40</td><td class="num">460</td><td><span class="chip r">ઓછો સ્ટોક</span></td></tr>
+        <tr><td>મોટું તપેલું (50 લિ.)</td><td>વાસણ</td><td>રસોડું</td><td class="num">12</td><td class="num">4</td><td class="num">0</td><td class="num">8</td><td><span class="chip g">બરાબર</span></td></tr>
+        <tr><td>પ્લાસ્ટિક ખુરશી</td><td>ફર્નિચર</td><td>હોલ</td><td class="num">600</td><td class="num">0</td><td class="num">12</td><td class="num">588</td><td><span class="chip g">બરાબર</span></td></tr>
+        <tr><td>ગાદલા</td><td>બિછાત</td><td>સ્ટોર રૂમ 2</td><td class="num">150</td><td class="num">0</td><td class="num">3</td><td class="num">147</td><td><span class="chip g">બરાબર</span></td></tr>
+        <tr><td>સાઉન્ડ સિસ્ટમ</td><td>ઇલેક્ટ્રિક</td><td>ઓફિસ</td><td class="num">2</td><td class="num">1</td><td class="num">0</td><td class="num">1</td><td><span class="chip">રિપેરિંગ બાકી</span></td></tr></table>
+      </div>
+      <div class="box"><b>હાલ બહાર આપેલ</b>
+        <table class="wt"><tr><th>બુકિંગ</th><th>કોને</th><th>વસ્તુ</th><th>આપનાર</th><th>પરત તારીખ</th><th></th></tr>
+        <tr><td>WB/26-27/0087</td><td>જયેશભાઈ ચૌહાણ</td><td>થાળી 500 · તપેલાં 4 · સાઉન્ડ 1</td><td>ભરતભાઈ</td><td>16 નવે</td><td><span class="btn">પરત લો</span></td></tr></table>
+      </div>
+    </div>
+    <figcaption>Items are issued against a booking and counted back in on return. Anything short or damaged is recorded and can be added to that booking's bill.</figcaption>
+  </figure>
+
+  <figure class="wf" id="wf-users" data-nav="8" data-url="users">
+    <div class="wf-head"><b>9. યુઝર્સ અને અધિકારો</b><span>Logins and permissions</span></div>
+    <div class="wf-main">
+      <div class="top"><h4>યુઝર્સ</h4><div class="btns"><span class="btn">રોલ બદલો</span><span class="btn pri">+ નવો યુઝર</span></div></div>
+      <div class="row">
+        <div class="box grow">
+          <table class="wt"><tr><th>નામ</th><th>મોબાઈલ (લોગિન)</th><th>રોલ</th><th>છેલ્લું લોગિન</th><th>સ્થિતિ</th></tr>
+          <tr><td>પ્રમુખશ્રી</td><td>98xxx xxx01</td><td><span class="chip b">Super Admin</span></td><td>આજે 09:10</td><td><span class="chip g">ચાલુ</span></td></tr>
+          <tr><td>કિશોરભાઈ</td><td>97xxx xxx14</td><td><span class="chip">રસીદ ક્લાર્ક</span></td><td>આજે 09:45</td><td><span class="chip g">ચાલુ</span></td></tr>
+          <tr><td>મહેશભાઈ</td><td>99xxx xxx52</td><td><span class="chip">વાડી મેનેજર</span></td><td>આજે 10:02</td><td><span class="chip g">ચાલુ</span></td></tr>
+          <tr><td>નીતિનભાઈ</td><td>94xxx xxx37</td><td><span class="chip">હિસાબનીશ</span></td><td>ગઈકાલે</td><td><span class="chip g">ચાલુ</span></td></tr>
+          <tr><td>ભરતભાઈ</td><td>98xxx xxx66</td><td><span class="chip">સ્ટોર કીપર</span></td><td>10 નવે</td><td><span class="chip r">બંધ કરેલ</span></td></tr></table>
+        </div>
+        <div class="box" style="width:300px"><b>રોલ: રસીદ ક્લાર્ક</b>
+          <table class="wt"><tr><th>મોડ્યુલ</th><th class="c">જુઓ</th><th class="c">બનાવો</th><th class="c">સુધારો</th><th class="c">રદ</th></tr>
+          <tr><td>સભ્યો</td><td class="c">☑</td><td class="c">☑</td><td class="c">☐</td><td class="c">☐</td></tr>
+          <tr><td>દાન રસીદ</td><td class="c">☑</td><td class="c">☑</td><td class="c">☐</td><td class="c">☐</td></tr>
+          <tr><td>વાડી બુકિંગ</td><td class="c">☐</td><td class="c">☐</td><td class="c">☐</td><td class="c">☐</td></tr>
+          <tr><td>હિસાબ</td><td class="c">☐</td><td class="c">☐</td><td class="c">☐</td><td class="c">☐</td></tr>
+          <tr><td>ઇન્વેન્ટરી</td><td class="c">☐</td><td class="c">☐</td><td class="c">☐</td><td class="c">☐</td></tr></table>
+          <span class="tag">ફક્ત પોતાની બનાવેલી રસીદ જોઈ શકે ☑</span>
+        </div>
+      </div>
+    </div>
+    <figcaption>Everyone has their own login, so no shared passwords. Switching a user off keeps their past receipts and log entries intact.</figcaption>
+  </figure>
+
+  <figure class="wf" id="wf-audit" data-nav="9" data-url="audit-log">
+    <div class="wf-head"><b>10. ઓડિટ લોગ</b><span>Who generated what, Super Admin only</span></div>
+    <div class="wf-main">
+      <div class="top"><h4>ઓડિટ લોગ</h4><div class="btns"><span class="btn">Excel</span></div></div>
+      <div class="row"><div class="f"><label>યુઝર</label><div>બધા ▾</div></div><div class="f"><label>પ્રકાર</label><div>રસીદ + બિલ ▾</div></div><div class="f"><label>ક્રિયા</label><div>બધી ▾</div></div><div class="f"><label>તારીખ</label><div>12/11/2026</div></div><div class="f"><label>નંબર શોધો</label><div>&nbsp;</div></div></div>
+      <div class="row">
+        <div class="kpi"><span>કિશોરભાઈ · આજે</span><b>14 રસીદ · ₹ 38,200</b></div>
+        <div class="kpi"><span>મહેશભાઈ · આજે</span><b>2 બિલ · ₹ 33,500</b></div>
+        <div class="kpi"><span>આજે રદ થયેલ</span><b>1</b></div>
+      </div>
+      <div class="box">
+        <table class="wt"><tr><th>સમય</th><th>યુઝર</th><th>ક્રિયા</th><th>દસ્તાવેજ</th><th class="num">રકમ ₹</th><th>વિગત</th><th>ડિવાઇસ</th></tr>
+        <tr><td>11:42:07</td><td>કિશોરભાઈ</td><td><span class="chip g">બનાવી</span></td><td>SD/26-27/0412</td><td class="num">5,100</td><td>રોકડ · WhatsApp મોકલ્યો</td><td>ઓફિસ PC</td></tr>
+        <tr><td>11:20:31</td><td>પ્રમુખશ્રી</td><td><span class="chip r">રદ કરી</span></td><td>SD/26-27/0409</td><td class="num">2,100</td><td>કારણ: નામમાં ભૂલ, નવી 0410</td><td>મોબાઈલ</td></tr>
+        <tr><td>10:15:54</td><td>મહેશભાઈ</td><td><span class="chip g">બનાવ્યું</span></td><td>WB/26-27/0087</td><td class="num">21,000</td><td>વાડી હોલ · 15 નવે</td><td>મોબાઈલ</td></tr>
+        <tr><td>10:16:40</td><td>મહેશભાઈ</td><td><span class="chip">સુધાર્યું</span></td><td>WB/26-27/0087</td><td class="num">21,000</td><td>ડિસ્કાઉન્ટ: 0 → 1,000</td><td>મોબાઈલ</td></tr>
+        <tr><td>09:45:12</td><td>કિશોરભાઈ</td><td><span class="chip">લોગિન</span></td><td>–</td><td class="num">–</td><td>OTP</td><td>ઓફિસ PC</td></tr></table>
+      </div>
+    </div>
+    <figcaption>Every create, edit, cancel, resend and login is recorded with the old and new value. The totals per user match what each person should hand over in cash at the end of the day.</figcaption>
+  </figure>
+
+  <figure class="wf" id="wf-whatsapp">
+    <div class="wf-head"><b>11. WhatsApp પર શું પહોંચે</b><span>What the donor and the hirer receive</span></div>
+    <div class="phones">
+      <div class="phone"><div class="bar">શ્યામધામ મધુરમ ✓</div><div class="chat">
+        <div class="bub"><div class="doc"><i>PDF</i><span>Receipt-SD-26-27-0412.pdf<br><span class="tag">1 પાનું · 84 KB</span></span></div>
+        <span>જય શ્રી કૃષ્ણ રમેશભાઈ,<br>આપના ₹5,100 ના દાન બદલ શ્યામધામ મધુરમ આભારી છે. રસીદ નં. SD/26-27/0412 સાથે જોડેલ છે.</span><span class="tag" style="text-align:right">11:42 ✓✓</span></div>
+      </div></div>
+      <div class="phone"><div class="bar">શ્યામધામ મધુરમ ✓</div><div class="chat">
+        <div class="bub"><div class="doc"><i>PDF</i><span>Bill-WB-26-27-0087.pdf<br><span class="tag">1 પાનું · 96 KB</span></span></div>
+        <span>જય શ્રી કૃષ્ણ જયેશભાઈ,<br>તા. 15/11/2026 ના વાડી બુકિંગનું બિલ જોડેલ છે.<br>કુલ ₹21,000 · ડિપોઝિટ ₹5,000 · બાકી ₹0</span><span class="tag" style="text-align:right">10:16 ✓✓</span></div>
+        <div class="bub"><span>યાદ અપાવીએ છીએ: આવતીકાલે સવારે 7 વાગ્યે વાડીની ચાવી ઓફિસેથી મળશે.</span><span class="tag" style="text-align:right">14 નવે 18:00 ✓✓</span></div>
+      </div></div>
+    </div>
+    <figcaption>Messages go from one official Shyamdham number with a verified name. The same PDF can be re-sent or printed from the portal at any time.</figcaption>
+  </figure>
+
+  </div>
+</section>
+
+<section class="col">
+  <h2>How it is built</h2>
+  <dl class="stack">
+    <div><dt>Web app that works on phone and PC</dt><dd>Opens in any browser, installs to the phone home screen. No app store needed. Gujarati first, English switch.</dd></div>
+    <div><dt>Cloud hosting in India</dt><dd>Managed server and PostgreSQL database in a Mumbai data centre, automatic daily backups, HTTPS everywhere.</dd></div>
+    <div><dt>WhatsApp Business API</dt><dd>The official Meta API through an approved provider. Needs one dedicated number, business verification and pre-approved message templates.</dd></div>
+    <div><dt>PDF receipts and bills</dt><dd>Generated on the server with Gujarati fonts, your letterhead, running number per financial year and a verification QR code.</dd></div>
+    <div><dt>Login by mobile OTP</dt><dd>No passwords to share or forget. Rights are checked on the server for every action, not only hidden in the menu.</dd></div>
+    <div><dt>Tamper-evident records</dt><dd>Financial documents are never deleted or silently edited. Corrections are a cancel plus a new document, both logged.</dd></div>
+  </dl>
+</section>
+
+<section>
+  <div class="col" style="display:flex;flex-direction:column;gap:12px">
+    <h2>Delivery in phases</h2>
+    <p>About 15 weeks from kickoff to full go-live for a small team. The office can start using members and donation receipts from week 7, with username and password login and receipts printed or shared by hand. WhatsApp sending and OTP login are added in the last stage. These are planning estimates and will firm up after the first phase.</p>
+  </div>
+  <div class="phases">
+    <div class="phase"><span>Week 1</span><b>Finalise details</b><p>Collect receipt and bill formats, account heads, rate card, role list. Set up the domain, hosting and a test site.</p></div>
+    <div class="phase"><span>Weeks 2–4</span><b>Foundation and members</b><p>Username and password login, roles, audit log, member and family registration, directory, import of the existing member list from Excel.</p></div>
+    <div class="phase"><span>Weeks 5–7</span><b>Donations and accounts</b><p>Receipt entry, PDF to print or download, account heads, vouchers, day book and head-wise reports. First go-live.</p></div>
+    <div class="phase"><span>Weeks 8–10</span><b>Wadi booking and bills</b><p>Calendar, rate card, deposits, bill PDF to print or download, payment posting.</p></div>
+    <div class="phase"><span>Weeks 11–12</span><b>Inventory and reports</b><p>Item register, issue and return against bookings, monthly and yearly reports, Super Admin dashboard. WhatsApp number verification is applied for here.</p></div>
+    <div class="phase"><span>Weeks 13–14</span><b>WhatsApp, messaging and OTP</b><p>Automatic WhatsApp sending of receipts and bills, booking reminders, broadcast messages to members, and login by mobile OTP in place of passwords.</p></div>
+    <div class="phase"><span>Week 15</span><b>Training and handover</b><p>Opening balances, hands-on training for each role in Gujarati, a short user guide, full go-live and support.</p></div>
+  </div>
+</section>
+
+<section class="col">
+  <h2>Decisions needed from the committee</h2>
+  <ul>
+    <li><b>WhatsApp number.</b> Which number becomes the official Shyamdham number? It cannot stay on the normal WhatsApp app once it moves to the API. Trust registration papers are needed for verification.</li>
+    <li><b>80G status.</b> If the trust has 80G approval, receipts must carry the approval number and the donor's PAN, and cash donations above ₹2,000 do not qualify for deduction. Please confirm the exact receipt wording with your CA.</li>
+    <li><b>GST on rentals.</b> Whether wadi bills need GST depends on the trust's registration and turnover. This is a question for your CA, and the bill format follows the answer.</li>
+    <li><b>Account heads and opening balances.</b> The list of income and expense heads in use today, and cash and bank balances on the start date.</li>
+    <li><b>Rate card.</b> Charges for each facility, member and non-member rates, deposit rules and cancellation rules.</li>
+    <li><b>Who gets which role.</b> Names and mobile numbers for each role, and who the Super Admin is.</li>
+    <li><b>Existing data.</b> Is the member list in Excel, a register, or an old software? This decides the import effort.</li>
+  </ul>
+  <p class="callout"><b>Running costs to budget for.</b> Hosting and database, the domain name, WhatsApp charges (Meta bills per message sent, and utility messages like receipts cost less than marketing broadcasts), SMS for OTP, and yearly support. I have not put rupee figures here because they depend on the provider you choose and your message volume.</p>
+</section>
+
+</div>
+
+<script>
+(function(){
+  var nav=["ડેશબોર્ડ","સભ્યો","મેસેજ","દાન રસીદ","વાડી બુકિંગ","હિસાબ","રિપોર્ટ","ઇન્વેન્ટરી","યુઝર્સ","ઓડિટ લોગ"];
+  document.querySelectorAll("figure.wf[data-nav]").forEach(function(fig){
+    var main=fig.querySelector(".wf-main"), on=+fig.dataset.nav;
+    var scroll=document.createElement("div"); scroll.className="wf-scroll"; scroll.tabIndex=0;
+    scroll.innerHTML='<div class="wf-frame"><div class="wf-chrome"><i></i><i></i><i></i><span class="url">shyamdham.example/'+fig.dataset.url+'</span><span class="who">ગુજરાતી | EN &nbsp;·&nbsp; '+(on===3?"કિશોરભાઈ (રસીદ ક્લાર્ક)":"પ્રમુખશ્રી (Super Admin)")+'</span></div><div class="wf-body"><nav class="wf-side"><div class="logo">શ્યામધામ</div>'+
+      nav.map(function(n,i){return '<a'+(i===on?' class="on"':'')+'>'+n+'</a>';}).join("")+'</nav></div></div>';
+    fig.insertBefore(scroll,main);
+    scroll.querySelector(".wf-body").appendChild(main);
+  });
+})();
+</script>

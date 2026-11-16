@@ -3,10 +3,10 @@
 export const MODULES = [
   { key: "members", gu: "સભ્યો અને ડિરેક્ટરી", en: "Members & directory", ready: true },
   { key: "messages", gu: "મેસેજ", en: "Messages", ready: false },
-  { key: "donations", gu: "દાન રસીદ", en: "Donation receipts", ready: false },
-  { key: "bookings", gu: "વાડી બુકિંગ અને બિલ", en: "Wadi booking & bills", ready: false },
-  { key: "accounts", gu: "હિસાબ અને રિપોર્ટ", en: "Accounts & reports", ready: false },
-  { key: "inventory", gu: "ઇન્વેન્ટરી", en: "Inventory", ready: false },
+  { key: "donations", gu: "દાન રસીદ", en: "Donation receipts", ready: true },
+  { key: "bookings", gu: "વાડી બુકિંગ અને બિલ", en: "Wadi booking & bills", ready: true },
+  { key: "accounts", gu: "હિસાબ અને રિપોર્ટ", en: "Accounts & reports", ready: true },
+  { key: "inventory", gu: "ઇન્વેન્ટરી", en: "Inventory", ready: true },
   { key: "users", gu: "યુઝર્સ અને રોલ", en: "Users & roles", ready: true },
 ] as const;
 

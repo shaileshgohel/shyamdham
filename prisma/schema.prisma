@@ -88,19 +88,19 @@ model Counter {
 // ---------- Members ----------
 
 model Family {
-  id             Int       @id @default(autoincrement())
-  familyNo       String    @unique // M-00001
+  id             Int      @id @default(autoincrement())
+  familyNo       String   @unique // M-00001
   address        String?
   area           String? // વિસ્તાર
   vatan          String? // મૂળ વતન
-  city           String?   @default("જુનાગઢ")
-  membershipType String    @default("સામાન્ય") // આજીવન / સામાન્ય
+  city           String?  @default("જુનાગઢ")
+  membershipType String   @default("સામાન્ય") // આજીવન / સામાન્ય
   notes          String?
-  isActive       Boolean   @default(true)
+  isActive       Boolean  @default(true)
   members        Member[]
   createdById    Int?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   @@index([area])
   @@index([vatan])
@@ -142,4 +142,241 @@ model MasterValue {
   sortOrder Int    @default(0)
 
   @@unique([type, value])
+}
+
+// ---------- Settings ----------
+
+// Trust details printed on receipts and bills (name, address, registration, PAN, 80G text…).
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+// ---------- Accounts (phase 2) ----------
+
+model AccountHead {
+  id        Int        @id @default(autoincrement())
+  type      String // INCOME | EXPENSE
+  nameGu    String
+  nameEn    String?
+  // System heads are used by donations and bookings automatically and cannot be switched off.
+  systemKey String?    @unique // donation_general, booking_rent, booking_damage, …
+  isActive  Boolean    @default(true)
+  sortOrder Int        @default(0)
+  vouchers  Voucher[]
+  donations Donation[]
+
+  @@unique([type, nameGu])
+}
+
+// A place money is kept: the cash box or a bank account.
+model MoneyAccount {
+  id             Int       @id @default(autoincrement())
+  kind           String // CASH | BANK
+  name           String    @unique
+  bankDetails    String? // bank, branch, last 4 digits
+  openingBalance Decimal   @default(0) @db.Decimal(14, 2)
+  openingDate    DateTime  @db.Date
+  isActive       Boolean   @default(true)
+  sortOrder      Int       @default(0)
+  vouchers       Voucher[] @relation("VoucherAccount")
+  contraIn       Voucher[] @relation("VoucherToAccount")
+}
+
+// Every movement of money is one voucher. Reports read only from here.
+//   INCOME / EXPENSE  — counted in income and expense reports
+//   DEPOSIT_IN / DEPOSIT_OUT — refundable booking deposits: move cash, but are not income
+//   CONTRA — transfer between two money accounts (e.g. cash deposited in bank)
+// Vouchers are never edited or deleted, only cancelled with a reason.
+model Voucher {
+  id             Int           @id @default(autoincrement())
+  voucherNo      String        @unique
+  date           DateTime      @db.Date
+  type           String
+  headId         Int?
+  head           AccountHead?  @relation(fields: [headId], references: [id])
+  accountId      Int
+  account        MoneyAccount  @relation("VoucherAccount", fields: [accountId], references: [id])
+  toAccountId    Int? // CONTRA only
+  toAccount      MoneyAccount? @relation("VoucherToAccount", fields: [toAccountId], references: [id])
+  amount         Decimal       @db.Decimal(14, 2)
+  mode           String        @default("CASH") // CASH | UPI | CHEQUE | BANK | ADJUST
+  reference      String? // cheque no. / UTR
+  party          String? // received from / paid to
+  narration      String?
+  source         String        @default("MANUAL") // MANUAL | DONATION | BOOKING
+  donationId     Int?          @unique
+  donation       Donation?     @relation(fields: [donationId], references: [id])
+  bookingId      Int?
+  booking        Booking?      @relation(fields: [bookingId], references: [id])
+  attachment     Bytes?
+  attachmentType String?
+  attachmentName String?
+  status         String        @default("ACTIVE") // ACTIVE | CANCELLED
+  cancelReason   String?
+  cancelledAt    DateTime?
+  cancelledById  Int?
+  createdById    Int
+  createdByName  String
+  createdAt      DateTime      @default(now())
+
+  @@index([date])
+  @@index([type, date])
+  @@index([headId, date])
+  @@index([accountId, date])
+  @@index([bookingId])
+}
+
+// ---------- Donations (phase 2) ----------
+
+model Donation {
+  id            Int         @id @default(autoincrement())
+  receiptNo     String      @unique // SD/26-27/0001
+  fy            String // 26-27
+  date          DateTime    @db.Date
+  donorName     String
+  familyId      Int?
+  mobile        String?
+  address       String?
+  pan           String?
+  headId        Int
+  head          AccountHead @relation(fields: [headId], references: [id])
+  amount        Decimal     @db.Decimal(14, 2)
+  mode          String // CASH | UPI | CHEQUE | BANK
+  reference     String?
+  accountId     Int
+  inMemoryOf    String?
+  notes         String?
+  verifyCode    String      @unique // random code behind the receipt's QR
+  status        String      @default("ACTIVE")
+  cancelReason  String?
+  cancelledAt   DateTime?
+  cancelledById Int?
+  createdById   Int
+  createdByName String
+  createdAt     DateTime    @default(now())
+  voucher       Voucher?
+
+  @@index([date])
+  @@index([familyId])
+  @@index([status, date])
+}
+
+// ---------- Wadi booking (phase 3) ----------
+
+model Facility {
+  id            Int               @id @default(autoincrement())
+  nameGu        String            @unique
+  nameEn        String?
+  memberRate    Decimal           @db.Decimal(12, 2) // per day
+  nonMemberRate Decimal           @db.Decimal(12, 2)
+  deposit       Decimal           @default(0) @db.Decimal(12, 2)
+  isActive      Boolean           @default(true)
+  sortOrder     Int               @default(0)
+  bookings      BookingFacility[]
+}
+
+// Extras on the rate card: utensil sets, gas, light and cleaning, chairs…
+model ChargeItem {
+  id        Int     @id @default(autoincrement())
+  nameGu    String  @unique
+  unit      String  @default("નંગ")
+  rate      Decimal @db.Decimal(12, 2)
+  isActive  Boolean @default(true)
+  sortOrder Int     @default(0)
+}
+
+model Booking {
+  id            Int               @id @default(autoincrement())
+  bookingNo     String            @unique // WB/26-27/0001
+  fy            String
+  hirerName     String
+  mobile        String?
+  address       String?
+  familyId      Int?
+  isMember      Boolean           @default(false)
+  eventType     String // લગ્ન, સગાઈ, બેસણું…
+  fromDate      DateTime          @db.Date
+  toDate        DateTime          @db.Date
+  slot          String            @default("FULL") // FULL | MORNING | EVENING
+  guests        Int?
+  notes         String?
+  depositAmount Decimal           @default(0) @db.Decimal(12, 2) // agreed deposit
+  status        String            @default("CONFIRMED") // CONFIRMED | COMPLETED | CANCELLED
+  cancelReason  String?
+  cancelledAt   DateTime?
+  createdById   Int
+  createdByName String
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  facilities    BookingFacility[]
+  lines         BookingLine[]
+  vouchers      Voucher[]
+  movements     StockMovement[]
+
+  @@index([fromDate, toDate])
+  @@index([status])
+}
+
+model BookingFacility {
+  id         Int      @id @default(autoincrement())
+  bookingId  Int
+  booking    Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  facilityId Int
+  facility   Facility @relation(fields: [facilityId], references: [id])
+
+  @@unique([bookingId, facilityId])
+  @@index([facilityId])
+}
+
+// Bill lines. kind: FACILITY | EXTRA | DAMAGE | DISCOUNT (amount negative)
+model BookingLine {
+  id          Int     @id @default(autoincrement())
+  bookingId   Int
+  booking     Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  kind        String
+  description String
+  qty         Decimal @db.Decimal(10, 2)
+  rate        Decimal @db.Decimal(12, 2)
+  amount      Decimal @db.Decimal(14, 2)
+  sortOrder   Int     @default(0)
+}
+
+// ---------- Inventory (phase 4) ----------
+
+model Item {
+  id         Int             @id @default(autoincrement())
+  nameGu     String          @unique
+  category   String // વાસણ, ફર્નિચર, બિછાત, ઇલેક્ટ્રિક, અન્ય
+  location   String?
+  unit       String          @default("નંગ")
+  minQty     Int             @default(0) // warn when available stock falls below this
+  chargeRate Decimal         @default(0) @db.Decimal(12, 2) // charged per piece lost or damaged on a booking
+  isActive   Boolean         @default(true)
+  notes      String?
+  movements  StockMovement[]
+  createdAt  DateTime        @default(now())
+}
+
+// Stock is never stored as a number; it is always the sum of these movements.
+//   PURCHASE +owned · ADJUST ±owned · ISSUE +out · RETURN −out
+//   RETURN_DAMAGED −out +damaged · RETURN_MISSING −out −owned
+//   DAMAGED +damaged · REPAIRED −damaged · WRITE_OFF −damaged −owned
+model StockMovement {
+  id            Int      @id @default(autoincrement())
+  itemId        Int
+  item          Item     @relation(fields: [itemId], references: [id])
+  date          DateTime @db.Date
+  type          String
+  qty           Int // positive, except ADJUST which may be negative
+  bookingId     Int?
+  booking       Booking? @relation(fields: [bookingId], references: [id])
+  notes         String?
+  createdById   Int
+  createdByName String
+  createdAt     DateTime @default(now())
+
+  @@index([itemId])
+  @@index([bookingId])
 }

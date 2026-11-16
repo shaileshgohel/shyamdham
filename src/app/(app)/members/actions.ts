@@ -2,7 +2,8 @@
 import { revalidatePath } from "next/cache";
 import { Prisma } from "@prisma/client";
 import { db, formatFamilyNo, nextCounter } from "@/lib/db";
-import { actorOf, PermissionError, requirePermission } from "@/lib/auth";
+import { actorOf, getCurrentUser, PermissionError, requirePermission } from "@/lib/auth";
+import { can } from "@/lib/permissions";
 import { audit, diff } from "@/lib/audit";
 import { fullName } from "@/lib/format";
 import {
@@ -25,6 +26,11 @@ export type SaveFamilyState = {
 };
 
 export async function saveFamilyAction(_prev: SaveFamilyState, form: FormData): Promise<SaveFamilyState> {
+  // Reject anyone without member rights before reading or validating the submitted data.
+  const caller = await getCurrentUser();
+  if (!caller || caller.mustChangePassword || !(can(caller.role, "members", "create") || can(caller.role, "members", "edit"))) {
+    return { error: "forbidden" };
+  }
   let raw: unknown;
   try {
     raw = JSON.parse(String(form.get("payload") ?? "{}"));

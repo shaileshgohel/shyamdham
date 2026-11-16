@@ -24,4 +24,4 @@ export function auditWhere(f: AuditFilters): Prisma.AuditLogWhereInput {
 }
 
 export const AUDIT_ACTIONS = ["login", "login_failed", "logout", "create", "edit", "cancel", "restore", "import", "export", "password_change", "password_reset"];
-export const AUDIT_ENTITIES = ["family", "member", "user", "role", "master_value", "session"];
+export const AUDIT_ENTITIES = ["donation", "voucher", "booking", "item", "family", "member", "user", "role", "account_head", "money_account", "facility", "charge_item", "setting", "master_value", "session"];

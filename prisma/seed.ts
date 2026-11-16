@@ -1,9 +1,17 @@
 // Creates the starting roles, the first Super Admin, and the pick-lists.
-// Safe to run more than once. With SEED_DEMO=1 it also adds a few clearly fictional
-// families for the committee's test site (never run that on the live database).
+// Safe to run more than once. With SEED_DEMO=1 it also adds clearly fictional demo data for
+// every screen (see seed-demo.ts) for the committee's test site — never on the live database.
+// Load .env when this script runs on its own (Node 20.12+); variables already set in the shell win.
+try {
+  process.loadEnvFile?.(".env");
+} catch {
+  /* no .env file: rely on the shell environment */
+}
+
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { DEFAULT_ROLES } from "../src/lib/permissions";
+import { seedDemoAll } from "./seed-demo";
 
 const db = new PrismaClient();
 
@@ -51,57 +59,69 @@ async function main() {
     }
   }
 
-  if (process.env.SEED_DEMO === "1") await seedDemo();
+  await seedSetup();
+  if (process.env.SEED_DEMO === "1") await seedDemoAll(db);
   console.log("Seed complete.");
 }
 
-// Fictional sample families for demos. Mobile numbers use the 90000 000xx range.
-async function seedDemo() {
-  if ((await db.family.count()) > 0) {
-    console.log("Families already exist, skipping demo data.");
-    return;
+// Account heads, money accounts, facilities and rate card. Rates are examples to change under setup.
+const HEADS: { type: string; nameGu: string; nameEn: string; systemKey?: string }[] = [
+  { type: "INCOME", nameGu: "સામાન્ય દાન", nameEn: "General donation", systemKey: "donation_general" },
+  { type: "INCOME", nameGu: "બાંધકામ ફંડ", nameEn: "Building fund" },
+  { type: "INCOME", nameGu: "ભોજન / અન્નક્ષેત્ર દાન", nameEn: "Food donation" },
+  { type: "INCOME", nameGu: "શિક્ષણ સહાય દાન", nameEn: "Education aid donation" },
+  { type: "INCOME", nameGu: "વાડી ભાડા આવક", nameEn: "Wadi rent", systemKey: "booking_rent" },
+  { type: "INCOME", nameGu: "નુકસાની વસૂલાત", nameEn: "Damage recovery", systemKey: "booking_damage" },
+  { type: "INCOME", nameGu: "સભ્ય ફી", nameEn: "Membership fee" },
+  { type: "INCOME", nameGu: "બેંક વ્યાજ", nameEn: "Bank interest" },
+  { type: "INCOME", nameGu: "અન્ય આવક", nameEn: "Other income" },
+  { type: "EXPENSE", nameGu: "લાઈટ બિલ", nameEn: "Electricity" },
+  { type: "EXPENSE", nameGu: "પાણી બિલ", nameEn: "Water" },
+  { type: "EXPENSE", nameGu: "પગાર", nameEn: "Salaries" },
+  { type: "EXPENSE", nameGu: "રિપેરિંગ / મેન્ટેનન્સ", nameEn: "Repairs & maintenance" },
+  { type: "EXPENSE", nameGu: "બાંધકામ ખર્ચ", nameEn: "Construction" },
+  { type: "EXPENSE", nameGu: "ઉત્સવ / કાર્યક્રમ ખર્ચ", nameEn: "Events" },
+  { type: "EXPENSE", nameGu: "સફાઈ ખર્ચ", nameEn: "Cleaning" },
+  { type: "EXPENSE", nameGu: "વાસણ / સામાન ખરીદી", nameEn: "Utensils & supplies" },
+  { type: "EXPENSE", nameGu: "ઓફિસ / સ્ટેશનરી", nameEn: "Office & stationery" },
+  { type: "EXPENSE", nameGu: "શિક્ષણ સહાય ચુકવણી", nameEn: "Education aid paid" },
+  { type: "EXPENSE", nameGu: "અન્ય ખર્ચ", nameEn: "Other expenses" },
+];
+
+async function seedSetup() {
+  for (const [i, h] of HEADS.entries()) {
+    const existing = h.systemKey
+      ? await db.accountHead.findUnique({ where: { systemKey: h.systemKey } })
+      : await db.accountHead.findUnique({ where: { type_nameGu: { type: h.type, nameGu: h.nameGu } } });
+    if (!existing) await db.accountHead.create({ data: { ...h, sortOrder: i } });
   }
-  const demo = [
-    { area: "મધુરម", vatan: "વંથલી", m: [["રમેશભાઈ", "મોહનભાઈ", "પરમાર", "સ્વયં", "M", "1971-03-12", "9000000010", "B+", "ધો. 12", "કોન્ટ્રાક્ટર", "પરિણીત"], ["ગીતાબેન", "રમેશભાઈ", "પરમાર", "પત્ની", "F", "1974-08-05", "", "O+", "ધો. 10", "ગૃહિણી", "પરિણીત"], ["હાર્દિક", "રમેશભાઈ", "પરમાર", "પુત્ર", "M", "1998-01-21", "9000000031", "B+", "B.E.", "એન્જિનિયર", "અપરિણીત"]] },
-    { area: "ઝાંઝરડા રોડ", vatan: "કેશોદ", m: [["જયેશભાઈ", "કાનજીભાઈ", "ચૌહાણ", "સ્વયં", "M", "1968-11-02", "9000000045", "A+", "ધો. 10", "વેપાર", "પરિણીત"], ["મીનાબેન", "જયેશભાઈ", "ચૌહાણ", "પત્ની", "F", "1972-06-17", "", "A+", "ધો. 10", "ગૃહિણી", "પરિણીત"]] },
-    { area: "ટીંબાવાડી", vatan: "માણાવદર", m: [["ભાવનાબેન", "દિનેશભાઈ", "ટાંક", "સ્વયં", "F", "1979-04-09", "9000000008", "O-", "સ્નાતક", "શિક્ષક", "વિધવા"], ["કૃણાલ", "દિનેશભાઈ", "ટાંક", "પુત્ર", "M", "2004-09-30", "9000000009", "O+", "ધો. 12", "અભ્યાસ", "અપરિણીત"]] },
-    { area: "મધુરમ", vatan: "વિસાવદર", m: [["વિનોદભાઈ", "બાબુભાઈ", "રાઠોડ", "સ્વયં", "M", "1960-01-15", "9000000077", "AB+", "પ્રાથમિક", "કડિયા કામ", "પરિણીત"], ["શારદાબેન", "વિનોદભાઈ", "રાઠોડ", "પત્ની", "F", "1963-02-20", "", "B+", "પ્રાથમિક", "ગૃહિણી", "પરિણીત"], ["અલ્પેશ", "વિનોદભાઈ", "રાઠોડ", "પુત્ર", "M", "1987-07-07", "9000000078", "AB+", "ITI", "બિલ્ડર", "પરિણીત"], ["નિશા", "અલ્પેશભાઈ", "રાઠોડ", "પુત્રવધૂ", "F", "1990-12-01", "", "A-", "સ્નાતક", "ગૃહિણી", "પરિણીત"]] },
-  ];
-  let n = 0;
-  for (const f of demo) {
-    n += 1;
-    await db.$transaction(async (tx) => {
-      const c = await tx.counter.upsert({ where: { key: "family" }, create: { key: "family", value: 1 }, update: { value: { increment: 1 } } });
-      const familyNo = `M-${String(c.value).padStart(5, "0")}`;
-      await tx.family.create({
-        data: {
-          familyNo,
-          area: f.area,
-          vatan: f.vatan,
-          address: `નમૂનો સરનામું ${n}, જુનાગઢ`,
-          notes: "DEMO — નમૂનાની વિગત",
-          members: {
-            create: f.m.map((r, i) => ({
-              isHead: i === 0,
-              sortOrder: i,
-              firstName: r[0],
-              fatherName: r[1],
-              surname: r[2],
-              relation: r[3],
-              gender: r[4],
-              dob: new Date(`${r[5]}T00:00:00Z`),
-              mobile: r[6] || null,
-              bloodGroup: r[7],
-              education: r[8],
-              occupation: r[9],
-              maritalStatus: r[10],
-            })),
-          },
-        },
-      });
+  const today = new Date();
+  const fyStart = today.getUTCMonth() >= 3 ? today.getUTCFullYear() : today.getUTCFullYear() - 1;
+  const openingDate = new Date(`${fyStart}-04-01T00:00:00Z`);
+  if (!(await db.moneyAccount.count())) {
+    await db.moneyAccount.create({ data: { kind: "CASH", name: "રોકડ", openingDate, sortOrder: 0 } });
+    await db.moneyAccount.create({ data: { kind: "BANK", name: "મુખ્ય બેંક ખાતું", bankDetails: "બેંકનું નામ અને ખાતા નં. અહીં લખો", openingDate, sortOrder: 1 } });
+  }
+  if (!(await db.facility.count())) {
+    await db.facility.createMany({
+      data: [
+        { nameGu: "વાડી હોલ", nameEn: "Wadi hall", memberRate: 15000, nonMemberRate: 20000, deposit: 5000, sortOrder: 0 },
+        { nameGu: "રસોડું", nameEn: "Kitchen", memberRate: 3000, nonMemberRate: 4000, deposit: 1000, sortOrder: 1 },
+        { nameGu: "ઉપરનો હોલ", nameEn: "Upper hall", memberRate: 5000, nonMemberRate: 7000, deposit: 2000, sortOrder: 2 },
+      ],
     });
   }
-  console.log(`Added ${demo.length} demo families.`);
+  if (!(await db.chargeItem.count())) {
+    await db.chargeItem.createMany({
+      data: [
+        { nameGu: "વાસણ સેટ (100 વ્યક્તિ)", unit: "સેટ", rate: 400, sortOrder: 0 },
+        { nameGu: "ગેસ", unit: "બાટલો", rate: 1100, sortOrder: 1 },
+        { nameGu: "લાઈટ / સફાઈ ચાર્જ", unit: "દિવસ", rate: 1500, sortOrder: 2 },
+        { nameGu: "વધારાની ખુરશી", unit: "નંગ", rate: 5, sortOrder: 3 },
+        { nameGu: "AC ચાર્જ", unit: "દિવસ", rate: 2000, sortOrder: 4 },
+      ],
+    });
+  }
 }
 
 main()

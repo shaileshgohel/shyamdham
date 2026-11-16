@@ -156,6 +156,13 @@ export async function requirePermission(module: ModuleKey, action: ActionKey) {
   return user;
 }
 
+/** Signed in with at least one of the given rights. */
+export async function requireAny(pairs: [ModuleKey, ActionKey][]) {
+  const user = await getCurrentUser();
+  if (!user || user.mustChangePassword || !pairs.some(([m, a]) => can(user.role, m, a))) throw new PermissionError();
+  return user;
+}
+
 export async function requireSuperAdmin() {
   const user = await getCurrentUser();
   if (!user || user.mustChangePassword || !canReadAudit(user.role)) throw new PermissionError();

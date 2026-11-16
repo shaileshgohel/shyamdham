@@ -16,14 +16,15 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const items: NavItem[] = [{ href: "/dashboard", label: t("nav_dashboard") }];
   if (can(r, "members", "view")) items.push({ href: "/members", label: t("nav_members") });
   if (can(r, "messages", "view")) items.push({ href: "/messages", label: t("nav_messages"), soon });
-  if (can(r, "donations", "view")) items.push({ href: "/donations", label: t("nav_donations"), soon });
-  if (can(r, "bookings", "view")) items.push({ href: "/bookings", label: t("nav_bookings"), soon });
-  if (can(r, "accounts", "view")) items.push({ href: "/accounts", label: t("nav_accounts"), soon });
-  if (can(r, "inventory", "view")) items.push({ href: "/inventory", label: t("nav_inventory"), soon });
+  if (can(r, "donations", "view")) items.push({ href: "/donations", label: t("nav_donations") });
+  if (can(r, "bookings", "view")) items.push({ href: "/bookings", label: t("nav_bookings") });
+  if (can(r, "accounts", "view")) items.push({ href: "/accounts", label: t("nav_accounts") });
+  if (can(r, "inventory", "view")) items.push({ href: "/inventory", label: t("nav_inventory") });
   const admin: NavItem[] = [];
   if (can(r, "members", "edit")) admin.push({ href: "/lists", label: t("nav_lists") });
   if (can(r, "users", "view")) admin.push({ href: "/users", label: t("nav_users") });
   if (can(r, "users", "view")) admin.push({ href: "/roles", label: t("nav_roles") });
+  if (canReadAudit(r)) admin.push({ href: "/settings", label: t.g("સંસ્થાની વિગત", "Trust details") });
   if (canReadAudit(r)) admin.push({ href: "/audit", label: t("nav_audit") });
   if (admin.length) items.push({ href: "", label: "", group: t.lang === "en" ? "Admin" : "વ્યવસ્થા" }, ...admin);
 

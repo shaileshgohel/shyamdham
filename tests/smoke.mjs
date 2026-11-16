@@ -83,7 +83,7 @@ await step("first login forces a password change", async () => {
 
 await step("dashboard shows family counts", async () => {
   expect(await page.isVisible("text=કુલ પરિવાર"), "no KPI");
-  const v = await page.locator(".kpi b").first().innerText();
+  const v = await page.locator(".kpi", { hasText: "કુલ પરિવાર" }).locator("b").innerText();
   expect(v === "4", `families KPI = ${v}`);
   await shot("02-dashboard");
 });

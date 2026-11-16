@@ -279,3 +279,19 @@ details.changes summary { cursor: pointer; color: var(--brand); font-size: 13px;
 /* page-level confirmation after an action */
 .flash { position: sticky; top: 8px; z-index: 25; box-shadow: 0 4px 14px rgba(0,0,0,.12); }
 @media (max-width: 860px) { .flash { top: 60px; } }
+
+/* Gujarati typing helper (components/gujarati-typing.tsx) */
+.gu-pill { position: fixed; right: 12px; bottom: 12px; z-index: 40; display: flex; align-items: center; gap: 8px; padding: 4px 6px 4px 4px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; box-shadow: 0 4px 14px rgba(0,0,0,.14); font-size: 13px; max-width: calc(100vw - 24px); }
+.gu-toggle { display: flex; align-items: center; gap: 6px; border: 0; background: none; color: var(--muted); font: inherit; cursor: pointer; padding: 2px 4px 2px 2px; border-radius: 999px; }
+.gu-pill.on .gu-toggle { color: var(--ink); }
+.gu-mark { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; background: var(--line); color: var(--ink); font-weight: 700; font-size: 13px; }
+.gu-pill.on .gu-mark { background: var(--brand); color: var(--brand-ink); }
+.gu-word { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 40vw; padding-right: 2px; }
+.gu-q { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--line); background: none; color: var(--muted); font: inherit; font-size: 12px; cursor: pointer; }
+.gu-help { position: absolute; right: 0; bottom: calc(100% + 8px); width: min(560px, calc(100vw - 24px)); padding: 12px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: 0 8px 24px rgba(0,0,0,.18); font-size: 13px; line-height: 1.5; }
+.gu-help p { margin: 6px 0; }
+.gu-help table { width: 100%; border-collapse: collapse; margin: 6px 0; }
+.gu-help td { padding: 3px 6px 3px 0; vertical-align: top; border-top: 1px solid var(--line); font-size: 12.5px; }
+.gu-help .btn { margin-top: 4px; }
+@media (max-width: 700px) { .gu-label { display: none; } .gu-word { max-width: 55vw; } }
+@media print { .gu-pill { display: none !important; } }

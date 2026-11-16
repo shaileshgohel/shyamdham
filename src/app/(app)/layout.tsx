@@ -6,6 +6,7 @@ import { LangProvider } from "@/components/i18n-client";
 import { Shell, type NavItem } from "@/components/nav";
 import { logoutAction } from "../login/actions";
 import { LangLink } from "@/components/lang-link";
+import { GujaratiTyping } from "@/components/gujarati-typing";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const user = await requireUser();
@@ -43,6 +44,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <LangProvider lang={t.lang}>
       <Shell items={items} foot={foot} title={t("app_name")}>{children}</Shell>
+      <GujaratiTyping />
     </LangProvider>
   );
 }

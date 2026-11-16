@@ -11,6 +11,7 @@
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
+    "test:unit": "tsx tests/transliterate.ts",
     "test:e2e": "./tests/run-all.sh",
     "user:reset-password": "tsx scripts/reset-password.ts"
   },

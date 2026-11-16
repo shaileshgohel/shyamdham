@@ -16,6 +16,7 @@ Built so far: **phases 1–4**. WhatsApp sending, member messaging and OTP sign-
 | **Inventory** | Items by category and place, stock kept as a history of movements (purchase, count correction, damaged, repaired, written off), low-stock warnings, issue to a booking and take back as good / damaged / missing, with charges added to that booking's bill. |
 | Dashboard | Today's income and expense, month's donations, cash and bank balance, monthly chart, upcoming bookings, low stock, latest receipts and bills with who made them. |
 | Trust details | Name, address, registration no., PAN, 80G wording and footers printed on receipts and bills (Super Admin). |
+| **Gujarati typing** | Type English letters in any text field and Gujarati appears word by word (`ramesh` → રમેશ, `Rameshbhai Patel` → રમેશભાઈ પટેલ), on any keyboard. A dictionary covers common surnames, villages and words; a help panel lists the letter conventions. Toggle with the pill at the bottom right or Ctrl+G; numbers, mobile, PAN, usernames and English-name fields are left alone. |
 
 Receipts and bills are printed or saved as PDF from the browser. Automatic PDF files and WhatsApp sending come with the last phase.
 
@@ -91,10 +92,11 @@ src/lib/accounts.ts, reports.ts vouchers, balances and every accounts report
 src/lib/bookings.ts             double-booking check and bill totals
 src/lib/inventory.ts            stock from movements
 src/lib/money.ts                rupees, amount in Gujarati words, financial year
+src/lib/transliterate.ts        English letters → Gujarati for data entry (components/gujarati-typing.tsx)
 src/lib/i18n-dict.ts            every Gujarati/English label
 src/app/(app)/…                 signed-in pages
 src/app/login, change-password  sign-in pages
-tests/smoke.mjs                 end-to-end test
+tests/smoke.mjs, smoke-phase2.mjs  end-to-end tests · tests/transliterate.ts  typing-helper checks (npm run test:unit)
 ```
 
 Every page checks the role on the server, and every server action checks it again before writing, so hiding a menu item is never the only protection.

@@ -1,0 +1,9 @@
+{
+  "name": "શ્યામધામ મધુરમ",
+  "short_name": "શ્યામધામ",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#f5f7fb",
+  "theme_color": "#1d3f8f",
+  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}

@@ -1,0 +1,145 @@
+// શ્યામધામ મધુરમ portal — Phase 1 schema
+// Foundation (users, roles, sessions, audit log) and members (families, directory).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------- Foundation ----------
+
+model Role {
+  id           Int      @id @default(autoincrement())
+  key          String   @unique // stable code name, e.g. "super_admin"
+  nameGu       String
+  nameEn       String
+  // A super admin role passes every permission check, and is the only role that can read the audit log.
+  isSuperAdmin Boolean  @default(false)
+  // { "members": ["view","create","edit","cancel"], ... } — see src/lib/permissions.ts
+  permissions  Json     @default("{}")
+  users        User[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model User {
+  id                 Int        @id @default(autoincrement())
+  username           String     @unique
+  fullName           String
+  mobile             String?
+  passwordHash       String
+  mustChangePassword Boolean    @default(true)
+  isActive           Boolean    @default(true)
+  failedLogins       Int        @default(0)
+  lockedUntil        DateTime?
+  lastLoginAt        DateTime?
+  roleId             Int
+  role               Role       @relation(fields: [roleId], references: [id])
+  sessions           Session[]
+  auditLogs          AuditLog[]
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+}
+
+model Session {
+  id        Int      @id @default(autoincrement())
+  tokenHash String   @unique // sha256 of the cookie token; the raw token is never stored
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  ip        String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+// Append-only. A database trigger (see the init migration) rejects UPDATE, DELETE and TRUNCATE.
+model AuditLog {
+  id       BigInt   @id @default(autoincrement())
+  at       DateTime @default(now())
+  userId   Int?
+  user     User?    @relation(fields: [userId], references: [id], onDelete: Restrict)
+  userName String // snapshot, so the log stays readable if a user is renamed
+  action   String // login, login_failed, logout, create, edit, cancel, restore, import, export, password_change, password_reset
+  entity   String // user, role, family, member, master_value, session
+  entityId String?
+  docNo    String? // human document number, e.g. family no. M-00012 (later: receipt no.)
+  summary  String
+  changes  Json? // { field: [old, new] }
+  ip       String?
+  device   String?
+
+  @@index([at])
+  @@index([userId, at])
+  @@index([entity, entityId])
+  @@index([docNo])
+}
+
+model Counter {
+  key   String @id // e.g. "family"
+  value Int    @default(0)
+}
+
+// ---------- Members ----------
+
+model Family {
+  id             Int       @id @default(autoincrement())
+  familyNo       String    @unique // M-00001
+  address        String?
+  area           String? // વિસ્તાર
+  vatan          String? // મૂળ વતન
+  city           String?   @default("જુનાગઢ")
+  membershipType String    @default("સામાન્ય") // આજીવન / સામાન્ય
+  notes          String?
+  isActive       Boolean   @default(true)
+  members        Member[]
+  createdById    Int?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([area])
+  @@index([vatan])
+}
+
+model Member {
+  id            Int       @id @default(autoincrement())
+  familyId      Int
+  family        Family    @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  isHead        Boolean   @default(false)
+  sortOrder     Int       @default(0)
+  firstName     String
+  fatherName    String?
+  surname       String
+  relation      String    @default("સ્વયં") // સ્વયં, પત્ની, પુત્ર, પુત્રી, ...
+  gender        String? // M / F
+  dob           DateTime? @db.Date
+  mobile        String?
+  email         String?
+  bloodGroup    String?
+  education     String?
+  occupation    String?
+  maritalStatus String?
+  pan           String?
+  isAlive       Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([familyId])
+  @@index([mobile])
+  @@index([surname])
+}
+
+// Pick-lists that keep directory filters clean (વતન, વિસ્તાર, વ્યવસાય, અભ્યાસ).
+model MasterValue {
+  id        Int    @id @default(autoincrement())
+  type      String // VATAN | AREA | OCCUPATION | EDUCATION
+  value     String
+  sortOrder Int    @default(0)
+
+  @@unique([type, value])
+}

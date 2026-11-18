@@ -84,24 +84,32 @@ await step("first login forces a password change", async () => {
 await step("dashboard shows family counts", async () => {
   expect(await page.isVisible("text=કુલ પરિવાર"), "no KPI");
   const v = await page.locator(".kpi", { hasText: "કુલ પરિવાર" }).locator("b").innerText();
-  expect(v === "4", `families KPI = ${v}`);
+  const families = sql(`select count(*) from "Family" where "isActive"`);
+  expect(v === families, `families KPI = ${v}, database has ${families}`);
   await shot("02-dashboard");
 });
 
 await step("directory lists and searches families", async () => {
   await page.goto(`${BASE}/members`);
-  expect((await page.locator("table.t tbody tr").count()) === 4, "expected 4 rows");
+  const families = Number(sql(`select count(*) from "Family" where "isActive"`));
+  const rows = await page.locator("table.t tbody tr").count();
+  expect(rows === families, `expected ${families} rows, got ${rows}`);
   await page.fill("#q", "ચૌહાણ");
   await page.click("form.card button[type=submit]");
   await page.waitForURL("**q=**");
-  expect((await page.locator("table.t tbody tr").count()) === 1, "search should find 1");
+  const chauhan = Number(sql(`select count(distinct f.id) from "Family" f join "Member" m on m."familyId"=f.id where f."isActive" and (m.surname like '%ચૌહાણ%' or m."firstName" like '%ચૌહાણ%' or m."fatherName" like '%ચૌહાણ%')`));
+  const found = await page.locator("table.t tbody tr").count();
+  expect(found === chauhan && found < families, `search found ${found}, expected ${chauhan}`);
   await page.goto(`${BASE}/members?view=people&blood=B%2B`);
   const n = await page.locator("table.t tbody tr").count();
-  expect(n === 3, `B+ people = ${n}`);
+  const bplus = Number(sql(`select count(*) from "Member" m join "Family" f on f.id=m."familyId" where f."isActive" and m."bloodGroup"='B+'`));
+  expect(n === bplus, `B+ people = ${n}, expected ${bplus}`);
   await page.goto(`${BASE}/members`);
   await shot("03-directory");
 });
 
+let newFamilyNo = "";
+let newFamilyId = "";
 await step("register a family: validation, then save", async () => {
   await page.goto(`${BASE}/members/new`);
   await page.fill('[id="members.0.firstName"]', "મહેશભાઈ");
@@ -124,10 +132,12 @@ await step("register a family: validation, then save", async () => {
   expect((await page.inputValue('[id="members.1.relation"]')) === "પત્ની", "relation drop-down was reset after the error");
   await shot("04-family-form-error");
   await page.fill('[id="members.0.mobile"]', "9000000099");
+  newFamilyNo = `M-${String(Number(sql(`select coalesce(max(value),0) from "Counter" where key='family'`)) + 1).padStart(5, "0")}`;
   await page.click("button[type=submit]");
   await page.waitForURL(/\/members\/\d+\?saved=new/);
-  expect(await page.isVisible("text=પરિવાર M-00005 નોંધાઈ ગયો."), "success message missing");
-  expect(sql(`select count(*) from "Member" m join "Family" f on f.id=m."familyId" where f."familyNo"='M-00005'`) === "2", "2 members expected");
+  newFamilyId = page.url().match(/members\/(\d+)/)[1];
+  expect(await page.isVisible(`text=પરિવાર ${newFamilyNo} નોંધાઈ ગયો.`), `success message missing (expected ${newFamilyNo})`);
+  expect(sql(`select count(*) from "Member" where "familyId"=${newFamilyId}`) === "2", "2 members expected");
   await shot("05-family-detail");
 });
 
@@ -142,8 +152,8 @@ await step("duplicate head mobile is blocked", async () => {
 });
 
 await step("edit a family writes a field-level history entry", async () => {
-  const id = sql(`select id from "Family" where "familyNo"='M-00005'`);
-  await page.goto(`${BASE}/members/${id}/edit`);
+  expect(newFamilyId, "no family was registered in the previous step");
+  await page.goto(`${BASE}/members/${newFamilyId}/edit`);
   await page.fill("#area", "મધુરમ");
   await page.fill('[id="members.1.mobile"]', "9000000098");
   await page.click("button[type=submit]");
@@ -178,6 +188,7 @@ await step("import: errors are reported, nothing written", async () => {
 await step("import: valid file creates families", async () => {
   const good = path.join(OUT, "import-good.csv");
   fs.writeFileSync(good, "﻿પરિવાર કોડ,સંબંધ,નામ,પિતા/પતિનું નામ,અટક,જાતિ (પુ/સ્ત્રી),મોબાઈલ,જન્મ તારીખ (dd/mm/yyyy),બ્લડ ગ્રુપ,વિસ્તાર,મૂળ વતન\n101,સ્વયં,દિલીપભાઈ,ગોવિંદભાઈ,ટાંક,પુ,+91 90000 00150,01/02/1980,O+,ગાંધીગ્રામ,બિલખા\n101,પત્ની,ભારતીબેન,દિલીપભાઈ,ટાંક,સ્ત્રી,,15/07/1983,A+,,\n102,સ્વયં,નરેશભાઈ,હરિભાઈ,સોલંકી,પુ,9000000160,,B-,દોલતપરા,ભેસાણ\n");
+  const importLogs = Number(sql(`select count(*) from "AuditLog" where action='import'`));
   await page.goto(`${BASE}/members/import`);
   await page.setInputFiles("input[type=file]", good);
   await page.click("text=ફાઇલ તપાસો");
@@ -185,8 +196,8 @@ await step("import: valid file creates families", async () => {
   await shot("07-import-preview");
   await page.click("text=2 પરિવાર આયાત કરો");
   await page.waitForSelector("text=2 પરિવાર અને 3 સભ્યો આયાત થયા.");
-  expect(sql(`select mobile from "Member" where "firstName"='દિલીપભાઈ'`) === "9000000150", "mobile not normalised");
-  expect(sql(`select count(*) from "AuditLog" where action='import'`) === "3", "import audit rows");
+  expect(sql(`select mobile from "Member" where "firstName"='દિલીપભાઈ' and surname='ટાંક' order by id desc limit 1`) === "9000000150", "mobile not normalised");
+  expect(Number(sql(`select count(*) from "AuditLog" where action='import'`)) === importLogs + 3, "import audit rows");
 });
 
 let clerkPw = "";

@@ -61,6 +61,10 @@ await step("trust details appear on receipts", async () => {
   expect(sql(`select value from "Setting" where key='reg_no'`) === "E/1234/જુનાગઢ", "setting not saved");
 });
 
+// Reads "₹ 8,750" or "-₹ 1,200.50" as a number.
+const num = (s) => Number(s.replace(/[^\d.-]/g, ""));
+const inr = (n) => `₹ ${n.toLocaleString("en-IN", { maximumFractionDigits: 2 })}`;
+let cashBefore = NaN; // cash balance once the opening balance is set, before this suite's own entries
 await step("set the cash opening balance", async () => {
   await page.goto(`${BASE}/accounts/setup`);
   const cashForm = page.locator("form.card", { has: page.locator('input[name="name"][value="રોકડ"]') });
@@ -68,6 +72,9 @@ await step("set the cash opening balance", async () => {
   await cashForm.locator("button[type=submit]").click();
   await page.waitForSelector(".alert.ok");
   expect(sql(`select "openingBalance" from "MoneyAccount" where name='રોકડ'`) === "10000.00", "opening not saved");
+  await page.goto(`${BASE}/accounts`);
+  cashBefore = num(await page.locator(".kpi", { hasText: "રોકડ" }).first().locator("b").innerText());
+  expect(Number.isFinite(cashBefore), "cash KPI unreadable");
 });
 
 let donationId;
@@ -88,7 +95,9 @@ await step("donation receipt: bad amount rejected, then saved with member lookup
   const receipt = await page.locator("[data-testid=receipt]").innerText();
   expect(receipt.includes("પાંચ હજાર એકસો પૂરા"), "amount in words missing");
   expect(receipt.includes("E/1234/જુનાગઢ"), "registration no. missing");
-  expect(/SD\/\d\d-\d\d\/0005/.test(receipt), "receipt number not SD/yy-yy/0005");
+  const receiptNo = sql(`select "receiptNo" from "Donation" where id=${donationId}`);
+  const serial = String(sql(`select value from "Counter" where key like 'SD:%' order by key desc limit 1`)).padStart(4, "0");
+  expect(new RegExp(`^SD/\\d\\d-\\d\\d/${serial}$`).test(receiptNo) && receipt.includes(receiptNo), `receipt number ${receiptNo}, counter at ${serial}`);
   expect(sql(`select count(*) from "Voucher" where "donationId"=${donationId} and type='INCOME' and amount=5100`) === "1", "voucher not posted");
   await shot("receipt");
 });
@@ -156,10 +165,11 @@ await step("transfer cash to bank", async () => {
 });
 
 await step("cash balance adds up (opening + demo + new entries)", async () => {
-  // 10000 opening + 6200 demo cash receipts − 4700 demo cash expenses − 750 expense − 2000 to bank
+  // balance after the opening was set (includes the demo entries), then: the 5,100 receipt was
+  // cancelled (no effect), − 750 cash expense − 2000 moved to the bank
   await page.goto(`${BASE}/accounts`);
   const cash = await page.locator(".kpi", { hasText: "રોકડ" }).first().locator("b").innerText();
-  expect(cash === "₹ 8,750", `cash balance ${cash}`);
+  expect(num(cash) === cashBefore - 750 - 2000, `cash balance ${cash}, expected ${inr(cashBefore - 2750)}`);
   await shot("accounts");
 });
 
@@ -174,7 +184,7 @@ await step("reports: day book, head-wise, monthly, yearly, cash book, with Excel
   await page.goto(`${BASE}/accounts/reports?r=yearly`);
   await page.goto(`${BASE}/accounts/reports?r=book&account=${sql(`select id from "MoneyAccount" where name='રોકડ'`)}`);
   const closing = await page.locator("tfoot td").last().innerText();
-  expect(closing === "₹ 8,750", `cash book closing ${closing}`);
+  expect(num(closing) === cashBefore - 2750, `cash book closing ${closing}, expected ${inr(cashBefore - 2750)}`);
   for (const r of ["daybook", "headwise", "monthly", "yearly", "book"]) {
     const res = await page.request.get(`${BASE}/export/report?r=${r}&account=1`);
     expect(res.status() === 200 && (await res.body()).subarray(0, 2).toString() === "PK", `excel ${r} ${res.status()}`);
@@ -241,6 +251,9 @@ await step("booking payments: deposit, part rent, over-payment refused", async (
 
 await step("utensils: issue, over-issue refused, return with damage charged to the bill", async () => {
   const plate = sql(`select id from "Item" where "nameGu"='સ્ટીલ થાળી'`);
+  const k = async (label) => num(await page.locator(".kpi", { hasText: label }).locator("b").first().innerText());
+  await page.goto(`${BASE}/inventory/${plate}`);
+  const before = { owned: await k("કુલ"), damaged: await k("નુકસાનવાળી"), available: await k("ઉપલબ્ધ") };
   await page.goto(`${BASE}/bookings/${bookingId}/items`);
   const issue = page.locator("form", { hasText: "વસ્તુ આપો" }).last();
   await issue.locator(`input[name="issue.${plate}"]`).fill("5000");
@@ -257,10 +270,10 @@ await step("utensils: issue, over-issue refused, return with damage charged to t
   await ret.locator("button[type=submit]").click();
   await page.waitForSelector("text=₹ 600 ચાર્જ");
   await page.goto(`${BASE}/inventory/${plate}`);
-  const k = async (label) => page.locator(".kpi", { hasText: label }).locator("b").first().innerText();
-  expect((await k("કુલ")) === "994", `owned ${await k("કુલ")}`);
-  expect((await k("નુકસાનવાળી")) === "4", "damaged count wrong");
-  expect((await k("ઉપલબ્ધ")).startsWith("990"), `available ${await k("ઉપલબ્ધ")}`);
+  // 6 missing leave the stock for good; 4 damaged stay owned but unavailable
+  expect((await k("કુલ")) === before.owned - 6, `owned ${await k("કુલ")}, was ${before.owned}`);
+  expect((await k("નુકસાનવાળી")) === before.damaged + 4, `damaged ${await k("નુકસાનવાળી")}, was ${before.damaged}`);
+  expect((await k("ઉપલબ્ધ")) === before.available - 10, `available ${await k("ઉપલબ્ધ")}, was ${before.available}`);
 });
 
 await step("closing a booking is refused while money is due, then settled and closed", async () => {

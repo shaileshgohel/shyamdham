@@ -10,7 +10,7 @@ import { useG } from "./i18n-client";
 
 const STORAGE_KEY = "sd_gu_typing";
 type Field = HTMLInputElement | HTMLTextAreaElement;
-const SKIP = /username|password|current|confirm|mobile|phone|\bpan\b|reference|amount|rate|qty|file|payload|token|code|email|url|nameen|bank|search-no/;
+const SKIP = /username|password|current|confirm|mobile|phone|\bpan\b|reg_no|registration|gst|ifsc|upi|reference|amount|rate|qty|file|payload|token|code|email|url|nameen|bank|search-no/;
 
 function eligible(el: EventTarget | null): el is Field {
   if (!(el instanceof HTMLInputElement) && !(el instanceof HTMLTextAreaElement)) return false;
@@ -103,9 +103,10 @@ export function GujaratiTyping() {
           w.latin = typed;
         }
         apply(el, value.slice(0, w.start), value.slice(caret));
-      } else if (ev.inputType === "insertText" && ev.data && ev.data.length > 1 && /[A-Za-z]/.test(ev.data)) {
-        // A whole chunk arrived at once (a phone keyboard's word with its space, a suggestion, autofill):
-        // convert the English runs inside it and treat the word as finished.
+      } else if (ev.inputType === "insertText" && ev.data && ev.data.length > 1 && /^[A-Za-z]+[\s.,!?]*$/.test(ev.data)) {
+        // A whole English word arrived at once (a phone keyboard's word with its space, a suggestion):
+        // convert it and treat the word as finished. Anything with digits, symbols or Gujarati in it
+        // (a pasted registration number, an autofilled address) is left exactly as it came.
         const start = caret - ev.data.length;
         if (value.slice(start, caret) === ev.data) {
           const gu = transliterate(ev.data);

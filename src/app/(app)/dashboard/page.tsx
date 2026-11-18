@@ -5,16 +5,18 @@ import { requireUser } from "@/lib/auth";
 import { getT } from "@/lib/i18n";
 import { can, canReadAudit } from "@/lib/permissions";
 import { balances } from "@/lib/accounts";
-import { voucherTotals } from "@/lib/reports";
+import { headwise, voucherTotals } from "@/lib/reports";
 import { summarize, SLOT_EN, SLOT_GU } from "@/lib/bookings";
 import { stockByItem } from "@/lib/inventory";
 import { AuditTable } from "@/components/audit-table";
 import { fmtDate, istDayStart, todayIST } from "@/lib/format";
 import { dateOnly, inr, MONTHS_EN, MONTHS_GU, fyRange } from "@/lib/money";
+import { filterQs } from "@/lib/donation-query";
+import { MonthChart } from "./month-chart";
 
 export const metadata = { title: "ડેશબોર્ડ" };
 
-export default async function Dashboard({ searchParams }: { searchParams: Promise<{ denied?: string; pw?: string }> }) {
+export default async function Dashboard({ searchParams }: { searchParams: Promise<{ denied?: string; pw?: string; m?: string }> }) {
   const user = await requireUser();
   const t = await getT();
   const sp = await searchParams;
@@ -55,8 +57,22 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
     ...bookings.map((b) => ({ key: `b${b.id}`, href: `/bookings/${b.id}`, no: b.bookingNo, kind: t.g("વાડી બિલ", "Wadi bill"), name: b.hirerName, amount: summarize(b).total, by: b.createdByName, at: b.createdAt, cancelled: b.status === "CANCELLED" })),
   ].sort((a, b) => b.at.getTime() - a.at.getTime()).slice(0, 8);
   const months = Array.from(new Set(monthly.map((x) => x.m)));
-  const maxBar = Math.max(1, ...monthly.map((x) => Number(x.total)));
   const monthNames = t.lang === "en" ? MONTHS_EN : MONTHS_GU;
+  // Drill-down level 1: ?m=YYYY-MM selects a month of the chart and loads its head-wise breakdown.
+  const selMonth = sp.m && months.includes(sp.m) ? sp.m : undefined;
+  const monthRange = (m: string) => {
+    const [y, mo] = m.split("-").map(Number);
+    const last = new Date(Date.UTC(y, mo, 0)).getUTCDate();
+    return { from: `${m}-01`, to: `${m}-${String(last).padStart(2, "0")}` };
+  };
+  const breakdown = selMonth ? await headwise(monthRange(selMonth).from, monthRange(selMonth).to) : null;
+  const chartRows = months.map((m) => ({
+    m,
+    label: `${monthNames[Number(m.slice(5)) - 1]} ${m.slice(0, 4)}`,
+    income: Number(monthly.find((x) => x.m === m && x.type === "INCOME")?.total ?? 0),
+    expense: Number(monthly.find((x) => x.m === m && x.type === "EXPENSE")?.total ?? 0),
+    ...monthRange(m),
+  }));
   const slotL = (s: string) => (t.lang === "en" ? SLOT_EN : SLOT_GU)[s];
 
   return (
@@ -74,35 +90,35 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
       </div>
 
       <div className="kpis">
-        {todayT && <div className="kpi"><span>{t.g("આજની આવક", "Income today")}</span><b>{inr(todayT.income)}</b></div>}
-        {todayT && <div className="kpi"><span>{t.g("આજની જાવક", "Expense today")}</span><b>{inr(todayT.expense)}</b></div>}
-        {monthDon && <div className="kpi"><span>{t.g("આ મહિનાનું દાન", "Donations this month")}</span><b>{inr(monthDon._sum.amount)}</b></div>}
-        {show.accounts && <div className="kpi"><span>{t.g("રોકડ + બેંક સિલક", "Cash + bank balance")}</span><b>{inr(totalBal)}</b></div>}
-        {show.members && <div className="kpi"><span>{t("dash_families")}</span><b>{families.toLocaleString("en-IN")}</b></div>}
-        {show.members && <div className="kpi"><span>{t("dash_members")}</span><b>{members.toLocaleString("en-IN")}</b></div>}
+        {todayT && <Link className="kpi" href={`/accounts/vouchers?${filterQs({ from: today, to: today, type: "INCOME" })}`} title={t.g("આજના આવક વાઉચર જુઓ", "See today's income vouchers")}><span>{t.g("આજની આવક", "Income today")}</span><b>{inr(todayT.income)}</b></Link>}
+        {todayT && <Link className="kpi" href={`/accounts/vouchers?${filterQs({ from: today, to: today, type: "EXPENSE" })}`} title={t.g("આજના જાવક વાઉચર જુઓ", "See today's expense vouchers")}><span>{t.g("આજની જાવક", "Expense today")}</span><b>{inr(todayT.expense)}</b></Link>}
+        {monthDon && <Link className="kpi" href={`/donations?${filterQs({ from: monthStart, to: today })}`} title={t.g("આ મહિનાની રસીદો જુઓ", "See this month's receipts")}><span>{t.g("આ મહિનાનું દાન", "Donations this month")}</span><b>{inr(monthDon._sum.amount)}</b></Link>}
+        {show.accounts && <Link className="kpi" href="/accounts" title={t.g("ખાતાવાર સિલક જુઓ", "See balance by account")}><span>{t.g("રોકડ + બેંક સિલક", "Cash + bank balance")}</span><b>{inr(totalBal)}</b></Link>}
+        {show.members && <Link className="kpi" href="/members" title={t.g("કુટુંબ યાદી જુઓ", "Open the family directory")}><span>{t("dash_families")}</span><b>{families.toLocaleString("en-IN")}</b></Link>}
+        {show.members && <Link className="kpi" href="/members?view=people" title={t.g("સભ્ય યાદી જુઓ", "Open the member list")}><span>{t("dash_members")}</span><b>{members.toLocaleString("en-IN")}</b></Link>}
       </div>
 
       <div className="grid2">
         {show.accounts && months.length > 0 && (
-          <section className="card">
-            <h2>{t.g("માસિક આવક / જાવક", "Monthly income / expense")}</h2>
-            <div className="hbars">
-              {months.map((m) => {
-                const inc = Number(monthly.find((x) => x.m === m && x.type === "INCOME")?.total ?? 0);
-                const exp = Number(monthly.find((x) => x.m === m && x.type === "EXPENSE")?.total ?? 0);
-                return (
-                  <div key={m} style={{ display: "grid", gridTemplateColumns: "90px 1fr", gap: 8, alignItems: "center", fontSize: 13 }}>
-                    <span>{monthNames[Number(m.slice(5)) - 1]}</span>
-                    <span style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                      <span style={{ display: "flex", alignItems: "center", gap: 6 }}><i style={{ display: "block", height: 9, width: `${(inc / maxBar) * 80}%`, minWidth: inc ? 2 : 0, background: "var(--brand)", borderRadius: 2 }} /><span className="small">{inr(inc)}</span></span>
-                      <span style={{ display: "flex", alignItems: "center", gap: 6 }}><i style={{ display: "block", height: 9, width: `${(exp / maxBar) * 80}%`, minWidth: exp ? 2 : 0, background: "var(--gold)", borderRadius: 2 }} /><span className="small muted">{inr(exp)}</span></span>
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-            <span className="small muted"><span style={{ color: "var(--brand)" }}>■</span> {t.g("આવક", "Income")} &nbsp; <span style={{ color: "var(--gold)" }}>■</span> {t.g("જાવક", "Expense")}</span>
-          </section>
+          <MonthChart
+            rows={chartRows}
+            selected={selMonth}
+            breakdown={breakdown && selMonth ? { ...breakdown, ...monthRange(selMonth), label: chartRows.find((r) => r.m === selMonth)!.label } : null}
+            lang={t.lang}
+            labels={{
+              title: t.g("માસિક આવક / જાવક", "Monthly income / expense"),
+              income: t.g("આવક", "Income"),
+              expense: t.g("જાવક", "Expense"),
+              hint: t.g("મહિના પર ક્લિક કરો: હેડવાઈઝ વિગત", "Click a month for its head-wise breakdown"),
+              allMonths: t.g("‹ બધા મહિના", "‹ All months"),
+              allVouchers: t.g("આ મહિનાના બધા વાઉચર ›", "All vouchers of this month ›"),
+              entries: t.g("એન્ટ્રી", "entries"),
+              surplus: t.g("વધારો", "Surplus"),
+              deficit: t.g("ઘટ", "Deficit"),
+              none: t.g("આ મહિને કોઈ એન્ટ્રી નથી.", "No entries this month."),
+              headHint: t.g("હેડ પર ક્લિક કરો: વાઉચર યાદી", "Click a head to list its vouchers"),
+            }}
+          />
         )}
         {(show.bookings || show.inventory) && (
           <section className="card">
@@ -130,7 +146,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
         {show.accounts && bal.length > 0 && (
           <section className="card">
             <h2>{t.g("ખાતાની સિલક", "Account balances")}</h2>
-            <dl className="kv">{bal.map((b) => <Fragment key={b.id}><dt>{b.name}</dt><dd className="num" style={{ textAlign: "left" }}>{inr(b.balance)}</dd></Fragment>)}</dl>
+            <dl className="kv">{bal.map((b) => <Fragment key={b.id}><dt><Link href={`/accounts/reports?r=book&account=${b.id}&from=${monthStart}&to=${today}`} title={t.g("આ મહિનાની બુક જુઓ", "Open this month's book")}>{b.name}</Link></dt><dd className="num" style={{ textAlign: "left" }}>{inr(b.balance)}</dd></Fragment>)}</dl>
           </section>
         )}
         <section className="card">

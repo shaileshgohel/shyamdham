@@ -14,7 +14,7 @@ Built so far: **phases 1–4**. WhatsApp sending, member messaging and OTP sign-
 | **Accounts** | Income and expense heads, cash and bank accounts with opening balances, income / expense / transfer vouchers with a bill photo, day book, head-wise, monthly (April–March), yearly and cash/bank book reports, each with Excel and print. Vouchers cannot be edited or deleted, even directly in the database. |
 | **Wadi booking** | Facilities with member and non-member rates and deposits, rate card for extras, month calendar, bookings that block double booking of the same facility and slot (also under simultaneous saves), discount, deposit, bill payments and deposit refunds or adjustments posted to the accounts automatically, damage charges, printable bill, close or cancel with checks. |
 | **Inventory** | Items by category and place, stock kept as a history of movements (purchase, count correction, damaged, repaired, written off), low-stock warnings, issue to a booking and take back as good / damaged / missing, with charges added to that booking's bill. |
-| Dashboard | Today's income and expense, month's donations, cash and bank balance, monthly chart, upcoming bookings, low stock, latest receipts and bills with who made them. |
+| Dashboard | Today's income and expense, month's donations, cash and bank balance, monthly chart, upcoming bookings, low stock, latest receipts and bills with who made them. Every figure drills down: KPI tiles open the matching filtered list, a month in the chart opens its head-wise breakdown, and a head opens its vouchers. |
 | Trust details | Name, address, registration no., PAN, 80G wording and footers printed on receipts and bills (Super Admin). |
 | **Gujarati typing** | Type English letters in any text field and Gujarati appears word by word (`ramesh` → રમેશ, `Rameshbhai Patel` → રમેશભાઈ પટેલ), on any keyboard. A dictionary covers common surnames, villages and words; a help panel lists the letter conventions. Toggle with the pill at the bottom right or Ctrl+G; numbers, mobile, PAN, usernames and English-name fields are left alone. |
 
@@ -58,8 +58,14 @@ Two end-to-end suites drive the app in Chromium against a separate database (`sh
 - `tests/smoke-phase2.mjs` (21): receipts with QR verification and cancellation, database guards on money records, vouchers with a bill photo, transfers, every report and its Excel, a full booking (rates, double-booking block, deposit, payments, utensils issued and returned with damage charged, deposit adjustment, closing), stock counts, and a receipt clerk's limits.
 
 ```bash
+npx playwright install chromium
+```
+
+```bash
 npm run test:e2e
 ```
+
+The first command is needed once per machine (it downloads the browser Playwright drives). The suites expect a local Postgres with the `shyamdham` role and recreate `shyamdham_test` on every run; they seed the demo data and check against it, so they do not depend on any particular demo figures.
 
 Screenshots from each run are written to `tests/output/`.
 
@@ -79,7 +85,7 @@ Keep the test site on its own database.
 ## Code map
 
 ```
-docs/                           project plan and wireframes
+docs/                           project plan, wireframes, architecture.md (stack, architecture and schema diagrams)
 prisma/schema.prisma            data model
 prisma/migrations/              includes the audit-log and ledger triggers and the default heads, accounts and facilities
 prisma/seed.ts, seed-demo.ts    roles, pick-lists, first Super Admin; optional demo data for every screen
